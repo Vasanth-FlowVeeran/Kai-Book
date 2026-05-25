@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    webview::WebviewWindowBuilder,
     Emitter, Manager, PhysicalPosition,
 };
 
@@ -137,15 +136,24 @@ pub fn run() {
                 });
             }
 
+            // ---- Hide popup when it loses focus ----
+            if let Some(popup_window) = app.get_webview_window("tray-popup") {
+                let pw = popup_window.clone();
+                popup_window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::Focused(false) = event {
+                        let _ = pw.hide();
+                    }
+                });
+            }
+
             // ---- Build tray icon ----
             TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .tooltip("KaiBook")
                 .menu(&menu)
-                .show_menu_on_left_click(false) // left-click → popup, right-click → menu
+                .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
-                        // "Open KaiBook" from right-click menu
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
                             let _ = window.set_focus();
@@ -166,61 +174,27 @@ pub fn run() {
                             button_state: MouseButtonState::Up,
                             ..
                         } => {
-                            let popup_width: f64 = 320.0;
-                            let popup_height: f64 = 440.0;
-
-                            let (x, y) = if let Ok(Some(rect)) = tray.rect() {
-                                let (px, py) = match rect.position {
-                                    tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
-                                    tauri::Position::Logical(l) => (l.x, l.y),
-                                };
-                                let (sw, sh) = match rect.size {
-                                    tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
-                                    tauri::Size::Logical(l) => (l.width, l.height),
-                                };
-                                (px - (popup_width / 2.0) + (sw / 2.0), py + sh)
-                            } else {
-                                (400.0, 30.0)
-                            };
-
                             if let Some(popup) = app.get_webview_window("tray-popup") {
                                 if popup.is_visible().unwrap_or(false) {
                                     let _ = popup.hide();
                                 } else {
-                                    let _ = popup.set_position(PhysicalPosition::new(x as i32, y as i32));
+                                    // Position popup below tray icon
+                                    if let Ok(Some(rect)) = tray.rect() {
+                                        let (px, py) = match rect.position {
+                                            tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
+                                            tauri::Position::Logical(l) => (l.x, l.y),
+                                        };
+                                        let (sw, sh) = match rect.size {
+                                            tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
+                                            tauri::Size::Logical(l) => (l.width, l.height),
+                                        };
+                                        let x = px - 160.0 + (sw / 2.0);
+                                        let y = py + sh;
+                                        let _ = popup.set_position(PhysicalPosition::new(x as i32, y as i32));
+                                    }
                                     let _ = popup.show();
                                     let _ = popup.set_focus();
                                     let _ = app.emit_to("tray-popup", "refresh-contacts", ());
-                                }
-                            } else {
-                                let popup = WebviewWindowBuilder::new(
-                                    app,
-                                    "tray-popup",
-                                    tauri::WebviewUrl::App("tray.html".into()),
-                                )
-                                .title("KaiBook")
-                                .inner_size(popup_width, popup_height)
-                                .position(x, y)
-                                .resizable(false)
-                                .decorations(false)
-                                .skip_taskbar(true)
-                                .always_on_top(true)
-                                .visible(true)
-                                .focused(true)
-                                .build();
-
-                                match popup {
-                                    Ok(w) => {
-                                        let w_clone = w.clone();
-                                        w.on_window_event(move |event| {
-                                            if let tauri::WindowEvent::Focused(false) = event {
-                                                let _ = w_clone.hide();
-                                            }
-                                        });
-                                    }
-                                    Err(e) => {
-                                        eprintln!("Failed to create tray popup: {e}");
-                                    }
                                 }
                             }
                         }
@@ -230,11 +204,9 @@ pub fn run() {
                             button: MouseButton::Left,
                             ..
                         } => {
-                            // Hide the popup if it's open
                             if let Some(popup) = app.get_webview_window("tray-popup") {
                                 let _ = popup.hide();
                             }
-                            // Show the main window
                             if let Some(main_win) = app.get_webview_window("main") {
                                 let _ = main_win.show();
                                 let _ = main_win.set_focus();

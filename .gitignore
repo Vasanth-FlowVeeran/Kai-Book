@@ -7,6 +7,9 @@ dist/
 # Rust / Tauri
 src-tauri/target/
 
+# Contacts data
+.kaibook/
+
 # IDE
 .vscode/
 .idea/

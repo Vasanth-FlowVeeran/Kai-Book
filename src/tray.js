@@ -84,7 +84,10 @@ function renderContacts() {
     .map(
       (c) =>
         '<div class="tray-contact-item" data-id="' + c.id + '">' +
-          '<div class="tray-contact-name">' + escapeHtml(c.name) + "</div>" +
+          '<div class="tray-contact-left">' +
+            '<div class="tray-avatar" style="background:' + avatarColor(c.name) + '">' + initial(c.name) + '</div>' +
+            '<div class="tray-contact-name">' + escapeHtml(c.name) + "</div>" +
+          "</div>" +
           '<div class="tray-contact-time" data-timezone="' + escapeHtml(c.timezone) + '">' + formatTime(c.timezone) + "</div>" +
         "</div>"
     )
@@ -221,6 +224,25 @@ function escapeHtml(str) {
   var div = document.createElement("div");
   div.textContent = str || "";
   return div.innerHTML;
+}
+
+function initial(name) {
+  if (!name) return "?";
+  return name.trim().charAt(0).toUpperCase();
+}
+
+var AVATAR_COLORS = [
+  "#5348a6", "#e94560", "#2ecc71", "#e67e22",
+  "#3498db", "#9b59b6", "#1abc9c", "#e74c3c",
+  "#2980b9", "#8e44ad", "#27ae60", "#d35400",
+];
+
+function avatarColor(name) {
+  var hash = 0;
+  for (var i = 0; i < (name || "").length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 // ============================================
