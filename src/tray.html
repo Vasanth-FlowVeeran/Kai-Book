@@ -3,39 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KaiBook Tray</title>
+  <title>KaiBook</title>
   <link rel="stylesheet" href="tray.css">
 </head>
 <body>
-  <div class="tray-container">
-    <div class="tray-header">☕ KaiBook</div>
+  <div class="tray">
 
+    <!-- Search -->
     <div class="tray-search">
-      <input type="text" id="tray-search-input" placeholder="Quick search..." autofocus>
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="tray-search-input" placeholder="Search contacts..." spellcheck="false" autofocus>
     </div>
 
-    <div class="tray-contact-list" id="tray-contact-list">
-      <!-- contacts rendered here -->
-    </div>
+    <!-- Contact List -->
+    <div class="tray-list" id="tray-contact-list"></div>
 
-    <!-- Quick Add inline form (hidden by default) -->
-    <div id="quick-add-form" class="quick-add-form hidden">
-      <input type="text" id="qa-name" placeholder="Name *" class="qa-input">
-      <input type="text" id="qa-email" placeholder="Email" class="qa-input">
-      <input type="text" id="qa-phone" placeholder="Phone" class="qa-input">
+    <!-- Quick Add (hidden by default) -->
+    <div id="quick-add-form" class="qa hidden">
+      <div class="qa-title">New Contact</div>
+      <input type="text" id="qa-name" placeholder="Name" class="qa-input" spellcheck="false">
+      <input type="text" id="qa-email" placeholder="Email" class="qa-input" spellcheck="false">
+      <input type="text" id="qa-phone" placeholder="Phone" class="qa-input" spellcheck="false">
       <select id="qa-timezone" class="qa-input">
-        <option value="">Timezone (optional)</option>
+        <option value="">Timezone</option>
       </select>
-      <div class="qa-buttons">
-        <button type="button" class="tray-btn qa-cancel" id="qa-cancel">Cancel</button>
-        <button type="button" class="tray-btn qa-save" id="qa-save">Save</button>
+      <div class="qa-actions">
+        <button type="button" id="qa-cancel" class="qa-btn qa-btn-cancel">Cancel</button>
+        <button type="button" id="qa-save" class="qa-btn qa-btn-save">Add Contact</button>
       </div>
     </div>
 
-    <div class="tray-actions" id="tray-actions">
-      <button type="button" class="tray-btn" id="tray-quick-add">+ Quick Add</button>
-      <button type="button" class="tray-btn" id="tray-open-main">Open KaiBook</button>
-      <button type="button" class="tray-btn tray-btn-danger" id="tray-exit">Exit</button>
+    <!-- Footer Actions -->
+    <div class="tray-footer" id="tray-actions">
+      <button type="button" class="tray-action" id="tray-quick-add">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Quick Add
+      </button>
+      <button type="button" class="tray-action" id="tray-open-main">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        Open KaiBook
+      </button>
+      <button type="button" class="tray-action tray-action--danger" id="tray-exit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Quit
+      </button>
     </div>
   </div>
 

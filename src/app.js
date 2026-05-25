@@ -1,20 +1,18 @@
 // ============================================
-// KaiBook — Main Application Logic
+// KaiBook — Main Application Logic (Redesigned)
 // ============================================
 
 // Detect Tauri environment
 const IS_TAURI = Boolean(window.__TAURI_INTERNALS__);
 
-/**
- * Invoke a Tauri command (only available in the desktop app).
- * Returns null in browser mode.
- */
 async function tauriInvoke(cmd, args = {}) {
   if (!IS_TAURI) return null;
-  // window.__TAURI__.core.invoke is the Tauri v2 API
   return window.__TAURI__.core.invoke(cmd, args);
 }
 
+// ============================================
+// IANA TIMEZONES
+// ============================================
 const IANA_TIMEZONES = [
   "Africa/Cairo", "Africa/Johannesburg", "Africa/Lagos", "Africa/Nairobi",
   "America/Anchorage", "America/Bogota", "America/Chicago", "America/Denver",
@@ -39,6 +37,50 @@ const IANA_TIMEZONES = [
 ];
 
 // ============================================
+// AVATAR GRADIENTS (shared with tray)
+// ============================================
+const GRADIENTS = [
+  ["#6c5ce7", "#a29bfe"],
+  ["#e17055", "#fab1a0"],
+  ["#00b894", "#55efc4"],
+  ["#0984e3", "#74b9ff"],
+  ["#e84393", "#fd79a8"],
+  ["#fdcb6e", "#f39c12"],
+  ["#00cec9", "#81ecec"],
+  ["#6c5ce7", "#fd79a8"],
+  ["#e17055", "#fdcb6e"],
+  ["#0984e3", "#00cec9"],
+];
+
+function avatarGradient(name) {
+  let hash = 0;
+  for (let i = 0; i < (name || "").length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const g = GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+  return `linear-gradient(135deg, ${g[0]}, ${g[1]})`;
+}
+
+function initial(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return parts[0][0].toUpperCase();
+}
+
+// ============================================
+// SVG ICONS (inline for card rendering)
+// ============================================
+const ICON = {
+  mail: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>',
+  phone: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
+  globe: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/></svg>',
+  mapPin: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  edit: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  trash: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>',
+};
+
+// ============================================
 // MOCK DATA
 // ============================================
 const MOCK_CONTACTS = [
@@ -51,7 +93,7 @@ const MOCK_CONTACTS = [
     phoneSecondary: "",
     address: "350 Fifth Avenue, New York, NY 10118",
     timezone: "America/New_York",
-    notes: "Prefers email over phone. Available 10am–4pm ET.",
+    notes: "Prefers email over phone. Available 10am-4pm ET.",
     createdAt: "2026-05-20T09:00:00Z",
     updatedAt: "2026-05-20T09:00:00Z",
   },
@@ -92,9 +134,30 @@ let editingId = null;
 let confirmCallback = null;
 
 // ============================================
+// THEME (dark mode)
+// ============================================
+function initTheme() {
+  const saved = localStorage.getItem("kaibook_theme");
+  if (saved === "dark") {
+    document.body.classList.add("dark-mode");
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle("dark-mode");
+  const theme = isDark ? "dark" : "light";
+  localStorage.setItem("kaibook_theme", theme);
+  // Notify tray popup of theme change
+  if (IS_TAURI) {
+    window.__TAURI__.event.emit("theme-changed", { theme: theme });
+  }
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
 async function init() {
+  initTheme();
   await loadContacts();
   populateTimezoneDropdown();
   startLiveClock();
@@ -109,7 +172,6 @@ async function loadContacts() {
       if (loaded && loaded.length > 0) {
         contacts = loaded;
       } else {
-        // First run — seed with mock data and persist
         contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
         await saveContacts();
       }
@@ -118,7 +180,6 @@ async function loadContacts() {
       contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
     }
   } else {
-    // Browser fallback (dev mode)
     try {
       const stored = localStorage.getItem("kaibook_contacts");
       if (stored) {
@@ -150,11 +211,11 @@ async function saveContacts() {
 // ============================================
 function populateTimezoneDropdown() {
   const select = document.getElementById("form-timezone");
-  select.innerHTML = '<option value="">-- Select timezone --</option>';
+  select.innerHTML = '<option value="">Select timezone</option>';
   IANA_TIMEZONES.sort().forEach((tz) => {
     const option = document.createElement("option");
     option.value = tz;
-    option.textContent = tz;
+    option.textContent = tz.replace(/_/g, " ");
     select.appendChild(option);
   });
 }
@@ -164,7 +225,7 @@ function populateTimezoneDropdown() {
 // ============================================
 function startLiveClock() {
   setInterval(() => {
-    document.querySelectorAll(".contact-card-time").forEach((el) => {
+    document.querySelectorAll(".card-time").forEach((el) => {
       const tz = el.dataset.timezone;
       if (tz) el.textContent = formatTime(tz);
     });
@@ -173,16 +234,14 @@ function startLiveClock() {
 
 function formatTime(ianaZone) {
   try {
-    const now = new Date();
-    const formatted = now.toLocaleTimeString("en-US", {
+    return new Date().toLocaleTimeString("en-US", {
       timeZone: ianaZone,
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
-    return formatted;
   } catch (e) {
-    return "—:— —";
+    return "--:--";
   }
 }
 
@@ -205,6 +264,8 @@ function bindEvents() {
   });
 
   document.getElementById("contact-form").addEventListener("submit", handleFormSubmit);
+
+  document.getElementById("btn-theme").addEventListener("click", toggleTheme);
 
   document.getElementById("btn-settings").addEventListener("click", () => showPage("settings"));
   document.getElementById("btn-back-settings").addEventListener("click", () => showPage("main"));
@@ -239,7 +300,7 @@ function bindEvents() {
 }
 
 // ============================================
-// RENDER ALL
+// RENDER
 // ============================================
 function renderAll() {
   renderContacts();
@@ -251,9 +312,6 @@ function updateContactCount() {
     `${contacts.length} contact${contacts.length !== 1 ? "s" : ""}`;
 }
 
-// ============================================
-// RENDER MAIN CONTACT LIST
-// ============================================
 function renderContacts() {
   const list = document.getElementById("contact-list");
   const empty = document.getElementById("empty-state");
@@ -262,11 +320,11 @@ function renderContacts() {
     ? contacts.filter(
         (c) =>
           c.name.toLowerCase().includes(searchQuery) ||
-          c.emailPrimary.toLowerCase().includes(searchQuery) ||
-          c.emailSecondary.toLowerCase().includes(searchQuery) ||
-          c.phonePrimary.toLowerCase().includes(searchQuery) ||
-          c.address.toLowerCase().includes(searchQuery) ||
-          c.notes.toLowerCase().includes(searchQuery)
+          (c.emailPrimary || "").toLowerCase().includes(searchQuery) ||
+          (c.emailSecondary || "").toLowerCase().includes(searchQuery) ||
+          (c.phonePrimary || "").toLowerCase().includes(searchQuery) ||
+          (c.address || "").toLowerCase().includes(searchQuery) ||
+          (c.notes || "").toLowerCase().includes(searchQuery)
       )
     : contacts;
 
@@ -279,41 +337,71 @@ function renderContacts() {
   empty.classList.add("hidden");
 
   list.innerHTML = filtered
-    .map(
-      (c) => `
-    <div class="contact-card" data-id="${c.id}">
-      <div class="contact-card-header">
-        <div class="contact-card-name">${escapeHtml(c.name)}</div>
-        <div class="contact-card-time" data-timezone="${escapeHtml(c.timezone)}">${formatTime(c.timezone)}</div>
-      </div>
-      <div class="contact-card-details">
-        ${c.emailPrimary ? `<div class="contact-card-detail"><span class="label-icon">📧</span>${escapeHtml(c.emailPrimary)}</div>` : ""}
-        ${c.emailSecondary ? `<div class="contact-card-detail"><span class="label-icon">📧</span>${escapeHtml(c.emailSecondary)}</div>` : ""}
-        ${c.phonePrimary ? `<div class="contact-card-detail"><span class="label-icon">📞</span>${escapeHtml(c.phonePrimary)}</div>` : ""}
-        ${c.phoneSecondary ? `<div class="contact-card-detail"><span class="label-icon">📞</span>${escapeHtml(c.phoneSecondary)}</div>` : ""}
-        ${c.address ? `<div class="contact-card-detail address">📍 ${escapeHtml(c.address)}</div>` : ""}
-      </div>
-      ${c.timezone ? `<div class="contact-card-tz">🌐 ${escapeHtml(c.timezone)}</div>` : ""}
-      <div class="contact-card-actions">
-        <button type="button" class="card-action-btn edit" data-id="${c.id}">Edit</button>
-        <button type="button" class="card-action-btn delete" data-id="${c.id}">Del</button>
-      </div>
-    </div>
-  `
-    )
+    .map((c) => {
+      // Build subtitle line (email + phone)
+      const subParts = [];
+      if (c.emailPrimary) {
+        subParts.push(`<span>${ICON.mail} ${escapeHtml(c.emailPrimary)}</span>`);
+      }
+      if (c.phonePrimary) {
+        subParts.push(`<span>${ICON.phone} ${escapeHtml(c.phonePrimary)}</span>`);
+      }
+      const subLine = subParts.length > 0
+        ? `<div class="card-sub">${subParts.join("")}</div>`
+        : "";
+
+      // Build detail tags
+      const tags = [];
+      if (c.timezone) {
+        tags.push(`<span class="card-tag">${ICON.globe} ${escapeHtml(c.timezone.replace(/_/g, " "))}</span>`);
+      }
+      if (c.address) {
+        tags.push(`<span class="card-tag">${ICON.mapPin} ${escapeHtml(c.address)}</span>`);
+      }
+      if (c.emailSecondary) {
+        tags.push(`<span class="card-tag">${ICON.mail} ${escapeHtml(c.emailSecondary)}</span>`);
+      }
+      if (c.phoneSecondary) {
+        tags.push(`<span class="card-tag">${ICON.phone} ${escapeHtml(c.phoneSecondary)}</span>`);
+      }
+      if (c.notes) {
+        tags.push(`<span class="card-tag">${escapeHtml(c.notes)}</span>`);
+      }
+      const detailSection = tags.length > 0
+        ? `<div class="card-details">${tags.join("")}</div>`
+        : "";
+
+      return `
+      <div class="card" data-id="${c.id}">
+        <div class="card-top">
+          <div class="card-avatar" style="background:${avatarGradient(c.name)}">${initial(c.name)}</div>
+          <div class="card-main">
+            <div class="card-name">${escapeHtml(c.name)}</div>
+            ${subLine}
+          </div>
+          <div class="card-time" data-timezone="${escapeHtml(c.timezone || "")}">${c.timezone ? formatTime(c.timezone) : "--:--"}</div>
+        </div>
+        ${detailSection}
+        <div class="card-actions">
+          <button type="button" class="card-action edit" data-id="${c.id}" title="Edit">${ICON.edit}</button>
+          <button type="button" class="card-action delete" data-id="${c.id}" title="Delete">${ICON.trash}</button>
+        </div>
+      </div>`;
+    })
     .join("");
 
-  list.querySelectorAll(".card-action-btn.edit").forEach((btn) => {
+  // Bind card action buttons
+  list.querySelectorAll(".card-action.edit").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const id = e.target.dataset.id;
+      const id = e.currentTarget.dataset.id;
       const contact = contacts.find((c) => c.id === id);
       if (contact) openForm(contact);
     });
   });
 
-  list.querySelectorAll(".card-action-btn.delete").forEach((btn) => {
+  list.querySelectorAll(".card-action.delete").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const id = e.target.dataset.id;
+      const id = e.currentTarget.dataset.id;
       const contact = contacts.find((c) => c.id === id);
       if (contact) confirmDelete(contact);
     });
@@ -329,19 +417,19 @@ function openForm(contact = null) {
   form.reset();
 
   document.getElementById("modal-title").textContent = contact
-    ? "✏️ Edit Contact"
-    : "✏️ Add Contact";
+    ? "Edit Contact"
+    : "Add Contact";
   document.getElementById("form-id").value = contact ? contact.id : "";
 
   if (contact) {
     document.getElementById("form-name").value = contact.name;
-    document.getElementById("form-email-primary").value = contact.emailPrimary;
-    document.getElementById("form-email-secondary").value = contact.emailSecondary;
-    document.getElementById("form-phone-primary").value = contact.phonePrimary;
-    document.getElementById("form-phone-secondary").value = contact.phoneSecondary;
-    document.getElementById("form-address").value = contact.address;
-    document.getElementById("form-timezone").value = contact.timezone;
-    document.getElementById("form-notes").value = contact.notes;
+    document.getElementById("form-email-primary").value = contact.emailPrimary || "";
+    document.getElementById("form-email-secondary").value = contact.emailSecondary || "";
+    document.getElementById("form-phone-primary").value = contact.phonePrimary || "";
+    document.getElementById("form-phone-secondary").value = contact.phoneSecondary || "";
+    document.getElementById("form-address").value = contact.address || "";
+    document.getElementById("form-timezone").value = contact.timezone || "";
+    document.getElementById("form-notes").value = contact.notes || "";
   }
 
   document.getElementById("modal-overlay").classList.remove("hidden");
@@ -399,9 +487,8 @@ async function handleFormSubmit(e) {
 // CONFIRM & DELETE
 // ============================================
 function confirmDelete(contact) {
-  document.getElementById(
-    "confirm-message"
-  ).textContent = `Delete "${contact.name}"? This cannot be undone.`;
+  document.getElementById("confirm-message").textContent =
+    `Delete "${contact.name}"? This cannot be undone.`;
   confirmCallback = async () => {
     contacts = contacts.filter((c) => c.id !== contact.id);
     await saveContacts();
@@ -455,9 +542,8 @@ function importContacts(e) {
         await saveContacts();
         renderAll();
       };
-      document.getElementById(
-        "confirm-message"
-      ).textContent = `Import ${newContacts.length} contact${newContacts.length !== 1 ? "s" : ""}?`;
+      document.getElementById("confirm-message").textContent =
+        `Import ${newContacts.length} contact${newContacts.length !== 1 ? "s" : ""}?`;
       document.getElementById("confirm-overlay").classList.remove("hidden");
     } catch (err) {
       alert("Invalid JSON file.");
@@ -475,7 +561,7 @@ function generateId() {
 
 function escapeHtml(str) {
   const div = document.createElement("div");
-  div.textContent = str;
+  div.textContent = str || "";
   return div.innerHTML;
 }
 

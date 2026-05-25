@@ -16,3 +16,6 @@ src-tauri/target/
 *.swp
 *.swo
 .DS_Store
+
+
+.claude

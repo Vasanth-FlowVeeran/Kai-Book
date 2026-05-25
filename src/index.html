@@ -8,137 +8,172 @@
 </head>
 <body>
 
-  <!-- ==================== MAIN WINDOW ==================== -->
-
-  <!-- NAVIGATION / TOOLBAR -->
-  <div class="toolbar">
-    <div class="toolbar-title">☕ KaiBook</div>
-    <div class="toolbar-search">
-      <input type="text" id="main-search" placeholder="Search contacts...">
-    </div>
-    <div class="toolbar-actions">
-      <button type="button" class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+  <!-- ==================== TOOLBAR ==================== -->
+  <div class="toolbar" data-tauri-drag-region>
+    <div class="toolbar-left">
+      <div class="toolbar-brand">
+        <span class="brand-icon">📒</span>
+        <span class="brand-name">KaiBook</span>
+      </div>
       <span class="contact-count" id="contact-count">0 contacts</span>
     </div>
+    <div class="toolbar-center">
+      <div class="search-box">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="main-search" placeholder="Search contacts..." spellcheck="false">
+      </div>
+    </div>
+    <div class="toolbar-right">
+      <button type="button" class="theme-toggle" id="btn-theme" title="Toggle dark mode">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button type="button" class="toolbar-btn" id="btn-settings" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
   </div>
 
-  <!-- SETTINGS PAGE -->
+  <!-- ==================== SETTINGS ==================== -->
   <div id="page-settings" class="page hidden">
-    <div class="settings-container">
+    <div class="settings">
       <div class="settings-header">
-        <button type="button" class="back-btn" id="btn-back-settings">← Back</button>
-        <h2>⚙️ Settings</h2>
+        <button type="button" class="back-btn" id="btn-back-settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <h2 class="settings-title">Settings</h2>
       </div>
 
-      <div class="settings-section">
-        <h3 class="settings-label">🔑 Global Hotkey</h3>
-        <div class="hotkey-display">
-          <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>
-          <button type="button" class="btn-secondary btn-sm" disabled>Change</button>
+      <div class="setting-card">
+        <div class="setting-label">Keyboard Shortcut</div>
+        <div class="hotkey-row">
+          <kbd>Ctrl</kbd><span class="hotkey-plus">+</span><kbd>Shift</kbd><span class="hotkey-plus">+</span><kbd>K</kbd>
         </div>
-        <p class="settings-hint">Hotkey configuration available in Tauri build.</p>
+        <p class="setting-hint">Opens the tray popup from anywhere.</p>
       </div>
 
-      <div class="settings-section">
-        <h3 class="settings-label">📦 Data</h3>
-        <div class="settings-actions-row">
-          <button type="button" class="btn-primary" id="btn-export">Export Contacts (JSON)</button>
-          <button type="button" class="btn-secondary" id="btn-import">Import Contacts (JSON)</button>
+      <div class="setting-card">
+        <div class="setting-label">Data</div>
+        <div class="setting-actions">
+          <button type="button" class="btn btn-primary" id="btn-export">Export JSON</button>
+          <button type="button" class="btn btn-ghost" id="btn-import">Import JSON</button>
         </div>
       </div>
 
-      <div class="settings-section">
-        <h3 class="settings-label">🗄 Storage</h3>
-        <p class="settings-path">~/.kaibook/contacts.json</p>
+      <div class="setting-card">
+        <div class="setting-label">Storage</div>
+        <code class="setting-path">~/.kaibook/contacts.json</code>
       </div>
 
-      <div class="settings-section">
-        <h3 class="settings-label">ℹ️ About</h3>
-        <p class="settings-info">KaiBook v0.1.0 · MIT License</p>
-        <div class="settings-links">
-          <a href="#" class="link">GitHub</a>
-          <a href="#" class="link">Report Issue</a>
-        </div>
+      <div class="setting-card">
+        <div class="setting-label">About</div>
+        <p class="setting-about">KaiBook v0.1.0 · MIT License</p>
       </div>
     </div>
   </div>
 
-  <!-- MAIN LIST PAGE -->
+  <!-- ==================== MAIN LIST ==================== -->
   <div id="page-main" class="page">
-    <div class="contact-list" id="contact-list"></div>
-    <button type="button" class="add-contact-btn" id="btn-add-contact">+ Add New Contact</button>
+    <div class="contact-grid" id="contact-list"></div>
+    <button type="button" class="add-btn" id="btn-add-contact">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Contact
+    </button>
   </div>
 
-  <!-- EMPTY STATE -->
-  <div id="empty-state" class="empty-state hidden">
-    <div class="empty-icon">📇</div>
-    <h2>No contacts yet</h2>
-    <p>Add your first client and see their live local time.</p>
-    <button type="button" class="btn-primary" id="btn-add-first">+ Add New Contact</button>
+  <!-- ==================== EMPTY STATE ==================== -->
+  <div id="empty-state" class="empty hidden">
+    <div class="empty-visual">
+      <div class="empty-circle">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+    </div>
+    <h2 class="empty-title">No contacts yet</h2>
+    <p class="empty-desc">Add your first client to see their live local time.</p>
+    <button type="button" class="btn btn-primary" id="btn-add-first">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Contact
+    </button>
   </div>
 
   <!-- ==================== MODAL ==================== -->
   <div id="modal-overlay" class="modal-overlay hidden">
-    <div class="modal-window">
+    <div class="modal">
       <div class="modal-header">
-        <h2 id="modal-title">✏️ Add Contact</h2>
-        <button type="button" class="modal-close" id="modal-close">&times;</button>
+        <h2 id="modal-title" class="modal-title">Add Contact</h2>
+        <button type="button" class="modal-close" id="modal-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <form id="contact-form">
         <input type="hidden" id="form-id">
-        <div class="form-group">
-          <label for="form-name">Full Name <span class="required">*</span></label>
-          <input type="text" id="form-name" required placeholder="Alice Chen">
-        </div>
-        <div class="form-row">
+        <div class="form-section">
           <div class="form-group">
-            <label for="form-email-primary">Primary Email</label>
-            <input type="email" id="form-email-primary" placeholder="alice@company.com">
-          </div>
-          <div class="form-group">
-            <label for="form-email-secondary">Secondary Email</label>
-            <input type="email" id="form-email-secondary" placeholder="alice@gmail.com">
+            <label for="form-name">Full Name</label>
+            <input type="text" id="form-name" required placeholder="e.g. Alice Chen" spellcheck="false">
           </div>
         </div>
-        <div class="form-row">
+        <div class="form-section">
+          <div class="form-section-label">Contact</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-email-primary">Primary Email</label>
+              <input type="email" id="form-email-primary" placeholder="alice@company.com" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="form-email-secondary">Secondary Email</label>
+              <input type="email" id="form-email-secondary" placeholder="alice@gmail.com" spellcheck="false">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-phone-primary">Primary Phone</label>
+              <input type="text" id="form-phone-primary" placeholder="+1 (555) 123-4567">
+            </div>
+            <div class="form-group">
+              <label for="form-phone-secondary">Secondary Phone</label>
+              <input type="text" id="form-phone-secondary" placeholder="+1 (555) 987-6543">
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-label">Location</div>
           <div class="form-group">
-            <label for="form-phone-primary">Primary Phone</label>
-            <input type="text" id="form-phone-primary" placeholder="+1 (555) 123-4567">
+            <label for="form-address">Address</label>
+            <input type="text" id="form-address" placeholder="350 Fifth Avenue, New York, NY 10118">
           </div>
           <div class="form-group">
-            <label for="form-phone-secondary">Secondary Phone</label>
-            <input type="text" id="form-phone-secondary" placeholder="+1 (555) 987-6543">
+            <label for="form-timezone">Timezone</label>
+            <select id="form-timezone" required>
+              <option value="">Select timezone</option>
+            </select>
           </div>
         </div>
-        <div class="form-group">
-          <label for="form-address">Address</label>
-          <input type="text" id="form-address" placeholder="350 Fifth Avenue, New York, NY 10118">
+        <div class="form-section">
+          <div class="form-group">
+            <label for="form-notes">Notes</label>
+            <textarea id="form-notes" rows="2" placeholder="Any notes about this client..."></textarea>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="form-timezone">Timezone <span class="required">*</span></label>
-          <select id="form-timezone" required>
-            <option value="">-- Select timezone --</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="form-notes">Notes</label>
-          <textarea id="form-notes" rows="2" placeholder="Any notes about this client..."></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" id="btn-cancel">Cancel</button>
-          <button type="submit" class="btn-primary">💾 Save Contact</button>
+        <div class="form-footer">
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Contact</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ==================== CONFIRM DIALOG ==================== -->
+  <!-- ==================== CONFIRM ==================== -->
   <div id="confirm-overlay" class="modal-overlay hidden">
-    <div class="confirm-window">
-      <p id="confirm-message">Are you sure?</p>
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" id="btn-confirm-cancel">Cancel</button>
-        <button type="button" class="btn-danger" id="btn-confirm-ok">Delete</button>
+    <div class="confirm">
+      <div class="confirm-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      </div>
+      <p id="confirm-message" class="confirm-text">Are you sure?</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" id="btn-confirm-cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-ok">Delete</button>
       </div>
     </div>
   </div>
