@@ -18,32 +18,122 @@ Kai-Book is a versatile system tray contact book designed specifically for freel
 *   **Build Tool:** Vite 6
 *   **Data Storage:** Local JSON file (`~/.kaibook/contacts.json`)
 
-## Prerequisites
+## Installation
 
-*   [Node.js](https://nodejs.org/) 18+ and npm
-*   [Rust](https://www.rust-lang.org/tools/install) (latest stable, via `rustup`)
-*   Tauri v2 system dependencies — see [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/)
+### macOS
 
-## Getting Started
+1. **Install Node.js 18+** — download from [nodejs.org](https://nodejs.org/) (LTS) or via Homebrew:
+   ```bash
+   brew install node
+   ```
+
+2. **Install Rust** via rustup:
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   source "$HOME/.cargo/env"
+   ```
+
+3. **Install Xcode Command Line Tools** (provides the C/C++ compiler Rust needs):
+   ```bash
+   xcode-select --install
+   ```
+
+4. **Clone and run:**
+   ```bash
+   git clone https://github.com/your-username/Kai-Book.git
+   cd Kai-Book
+   npm install
+   npm run tauri dev
+   ```
+
+### Windows
+
+1. **Install Node.js 18+** — download the LTS installer from [nodejs.org](https://nodejs.org/).
+
+2. **Install Microsoft C++ Build Tools** — download [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), run the installer, and select the **"Desktop development with C++"** workload. This provides the MSVC linker that Rust requires.
+
+3. **Install Rust** — open PowerShell and run:
+   ```powershell
+   winget install Rustlang.Rustup
+   ```
+   Close and reopen PowerShell after installation so `cargo` is on your PATH.
+
+4. **Install WebView2** — Windows 10 (1803+) and Windows 11 ship with it pre-installed. If you're on an older version, download it from [Microsoft](https://developer.microsoft.com/en-us/microsoft-edge/webview2/).
+
+5. **Clone and run:**
+   ```powershell
+   git clone https://github.com/your-username/Kai-Book.git
+   cd Kai-Book
+   npm install
+   npm run tauri dev
+   ```
+
+### Linux (Ubuntu / Debian)
+
+1. **Install system dependencies:**
+   ```bash
+   sudo apt update
+   sudo apt install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+     libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+   ```
+
+2. **Install Node.js 18+:**
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt install -y nodejs
+   ```
+
+3. **Install Rust:**
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   source "$HOME/.cargo/env"
+   ```
+
+4. **Clone and run:**
+   ```bash
+   git clone https://github.com/your-username/Kai-Book.git
+   cd Kai-Book
+   npm install
+   npm run tauri dev
+   ```
+
+### Linux (Fedora / RHEL)
+
+1. **Install system dependencies:**
+   ```bash
+   sudo dnf install -y webkit2gtk4.1-devel openssl-devel curl wget file \
+     libxdo-devel libappindicator-gtk3-devel librsvg2-devel
+   sudo dnf group install -y "C Development Tools and Libraries"
+   ```
+
+2. **Install Node.js 18+:**
+   ```bash
+   sudo dnf install -y nodejs
+   ```
+
+3. **Install Rust:**
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   source "$HOME/.cargo/env"
+   ```
+
+4. **Clone and run:**
+   ```bash
+   git clone https://github.com/your-username/Kai-Book.git
+   cd Kai-Book
+   npm install
+   npm run tauri dev
+   ```
+
+### Building for Production
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/your-username/Kai-Book.git
-cd Kai-Book
-
-# 2. Install JS dependencies
-npm install
-
-# 3. Run in development mode (opens a native window with hot reload)
-npm run tauri dev
-
-# 4. Build a production binary
 npm run tauri build
 ```
 
-The production binary will be in `src-tauri/target/release/`.
+The production binary will be in `src-tauri/target/release/`. On macOS this produces a `.dmg`, on Windows an `.msi` installer, and on Linux `.deb` and `.AppImage` files.
 
-### Browser-only dev mode (no Rust required)
+### Browser-only Dev Mode (no Rust required)
 
 If you just want to work on the UI without the native shell:
 
@@ -76,11 +166,13 @@ Kai-Book/
 
 ## Usage
 
-*   **Add a contact:** Click "+ Add New Contact" and fill in the form.
-*   **Search:** Use the search bar in the toolbar to filter contacts.
-*   **Tray popup:** Click the tray icon (or the ⬇️ button in-app) for quick access.
-*   **Quick Add (tray):** Use the "Quick Add" button with format: `name | email | phone | timezone`.
-*   **Import/Export:** Go to Settings (⚙️) to export or import contacts as JSON.
+*   **Single-click** the tray icon to open the quick-access popup with live local times.
+*   **Double-click** the tray icon (or click "Open KaiBook") to open the full app window.
+*   **Click a contact** in the popup to copy their email/phone to clipboard.
+*   **Quick Add:** Use the "+ Quick Add" button in the popup to add a contact inline.
+*   **Search:** Filter contacts by name, email, or phone in the popup or the main window.
+*   **Import/Export:** Go to Settings (⚙️) in the main window to export or import contacts as JSON.
+*   **Right-click** the tray icon for a context menu with "Open KaiBook" and "Quit".
 
 ## Contributing
 
