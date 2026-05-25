@@ -2,6 +2,19 @@
 // KaiBook — Main Application Logic
 // ============================================
 
+// Detect Tauri environment
+const IS_TAURI = Boolean(window.__TAURI_INTERNALS__);
+
+/**
+ * Invoke a Tauri command (only available in the desktop app).
+ * Returns null in browser mode.
+ */
+async function tauriInvoke(cmd, args = {}) {
+  if (!IS_TAURI) return null;
+  // window.__TAURI__.core.invoke is the Tauri v2 API
+  return window.__TAURI__.core.invoke(cmd, args);
+}
+
 const IANA_TIMEZONES = [
   "Africa/Cairo", "Africa/Johannesburg", "Africa/Lagos", "Africa/Nairobi",
   "America/Anchorage", "America/Bogota", "America/Chicago", "America/Denver",
@@ -81,30 +94,55 @@ let confirmCallback = null;
 // ============================================
 // INITIALIZATION
 // ============================================
-function init() {
-  loadContacts();
+async function init() {
+  await loadContacts();
   populateTimezoneDropdown();
   startLiveClock();
   bindEvents();
   renderAll();
 }
 
-function loadContacts() {
-  try {
-    const stored = localStorage.getItem("kaibook_contacts");
-    if (stored) {
-      contacts = JSON.parse(stored);
-    } else {
+async function loadContacts() {
+  if (IS_TAURI) {
+    try {
+      const loaded = await tauriInvoke("load_contacts");
+      if (loaded && loaded.length > 0) {
+        contacts = loaded;
+      } else {
+        // First run — seed with mock data and persist
+        contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
+        await saveContacts();
+      }
+    } catch (e) {
+      console.error("Tauri load_contacts failed:", e);
       contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
-      saveContacts();
     }
-  } catch (e) {
-    contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
+  } else {
+    // Browser fallback (dev mode)
+    try {
+      const stored = localStorage.getItem("kaibook_contacts");
+      if (stored) {
+        contacts = JSON.parse(stored);
+      } else {
+        contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
+        saveContacts();
+      }
+    } catch (e) {
+      contacts = JSON.parse(JSON.stringify(MOCK_CONTACTS));
+    }
   }
 }
 
-function saveContacts() {
-  localStorage.setItem("kaibook_contacts", JSON.stringify(contacts));
+async function saveContacts() {
+  if (IS_TAURI) {
+    try {
+      await tauriInvoke("save_contacts", { contacts });
+    } catch (e) {
+      console.error("Tauri save_contacts failed:", e);
+    }
+  } else {
+    localStorage.setItem("kaibook_contacts", JSON.stringify(contacts));
+  }
 }
 
 // ============================================
@@ -176,7 +214,7 @@ function bindEvents() {
   document.getElementById("tray-open-main").addEventListener("click", () => {
     document.getElementById("tray-popup").classList.add("hidden");
   });
-  document.getElementById("tray-quick-add").addEventListener("click", () => {
+  document.getElementById("tray-quick-add").addEventListener("click", async () => {
     const quickInput = prompt("Quick Add: name | email | phone | timezone");
     if (!quickInput) return;
     const parts = quickInput.split("|").map((s) => s.trim());
@@ -194,7 +232,7 @@ function bindEvents() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
-    saveContacts();
+    await saveContacts();
     renderAll();
   });
   document.getElementById("tray-search-input").addEventListener("input", () => renderTrayPopup());
@@ -401,7 +439,7 @@ function closeModal() {
   editingId = null;
 }
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
   e.preventDefault();
   const formData = {
     id: editingId,
@@ -438,7 +476,7 @@ function handleFormSubmit(e) {
     });
   }
 
-  saveContacts();
+  await saveContacts();
   closeModal();
   renderAll();
 }
@@ -450,9 +488,9 @@ function confirmDelete(contact) {
   document.getElementById(
     "confirm-message"
   ).textContent = `Delete "${contact.name}"? This cannot be undone.`;
-  confirmCallback = () => {
+  confirmCallback = async () => {
     contacts = contacts.filter((c) => c.id !== contact.id);
-    saveContacts();
+    await saveContacts();
     renderAll();
   };
   document.getElementById("confirm-overlay").classList.remove("hidden");
@@ -498,9 +536,9 @@ function importContacts(e) {
         ...c,
         id: c.id && !existingIds.has(c.id) ? c.id : generateId(),
       }));
-      confirmCallback = () => {
+      confirmCallback = async () => {
         contacts = [...contacts, ...newContacts];
-        saveContacts();
+        await saveContacts();
         renderAll();
       };
       document.getElementById(

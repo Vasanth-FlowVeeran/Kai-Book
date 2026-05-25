@@ -13,21 +13,78 @@ Kai-Book is a versatile system tray contact book designed specifically for freel
 
 ## Technologies Used
 
-*   HTML5
-*   CSS3 (with CSS variables for theming)
-*   JavaScript (ES6+)
+*   **Frontend:** HTML5, CSS3 (CSS variables for theming), JavaScript (ES6+)
+*   **Desktop Shell:** Tauri v2 (Rust)
+*   **Build Tool:** Vite 6
+*   **Data Storage:** Local JSON file (`~/.kaibook/contacts.json`)
+
+## Prerequisites
+
+*   [Node.js](https://nodejs.org/) 18+ and npm
+*   [Rust](https://www.rust-lang.org/tools/install) (latest stable, via `rustup`)
+*   Tauri v2 system dependencies — see [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/)
 
 ## Getting Started
 
-*(Placeholder for installation/setup instructions - usually involves cloning the repo and opening `index.html` for web or building for Tauri)*
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-username/Kai-Book.git
+cd Kai-Book
+
+# 2. Install JS dependencies
+npm install
+
+# 3. Run in development mode (opens a native window with hot reload)
+npm run tauri dev
+
+# 4. Build a production binary
+npm run tauri build
+```
+
+The production binary will be in `src-tauri/target/release/`.
+
+### Browser-only dev mode (no Rust required)
+
+If you just want to work on the UI without the native shell:
+
+```bash
+npm run dev
+# Open http://localhost:1420 in your browser
+```
+
+In browser mode, contacts are stored in `localStorage` instead of the filesystem.
+
+## Project Structure
+
+```
+Kai-Book/
+├── src/                    # Frontend (served by Vite)
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+├── src-tauri/              # Tauri / Rust backend
+│   ├── Cargo.toml
+│   ├── tauri.conf.json     # Tauri configuration
+│   ├── capabilities/       # Tauri v2 permissions
+│   ├── icons/              # App & tray icons
+│   └── src/
+│       ├── main.rs         # Entry point
+│       └── lib.rs          # Commands & tray setup
+├── package.json
+└── vite.config.js
+```
 
 ## Usage
 
-*(Placeholder for how to use the application, e.g., adding contacts, using the tray, searching)*
+*   **Add a contact:** Click "+ Add New Contact" and fill in the form.
+*   **Search:** Use the search bar in the toolbar to filter contacts.
+*   **Tray popup:** Click the tray icon (or the ⬇️ button in-app) for quick access.
+*   **Quick Add (tray):** Use the "Quick Add" button with format: `name | email | phone | timezone`.
+*   **Import/Export:** Go to Settings (⚙️) to export or import contacts as JSON.
 
 ## Contributing
 
-*(Placeholder for contribution guidelines)*
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
