@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaiBook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==================== TRAY POPUP ==================== -->
+  <div id="tray-popup" class="popup-overlay hidden">
+    <div class="tray-popup-window">
+      <div class="tray-popup-header">☕ KaiBook</div>
+      <div class="tray-search">
+        <input type="text" id="tray-search-input" placeholder="Quick search...">
+      </div>
+      <div class="tray-contact-list" id="tray-contact-list"></div>
+      <div class="tray-actions">
+        <button type="button" class="tray-btn" id="tray-quick-add">+ Quick Add</button>
+        <button type="button" class="tray-btn" id="tray-open-main">Open KaiBook</button>
+        <button type="button" class="tray-btn tray-btn-danger" id="tray-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN WINDOW ==================== -->
+
+  <!-- NAVIGATION / TOOLBAR -->
+  <div class="toolbar">
+    <div class="toolbar-title">☕ KaiBook</div>
+    <div class="toolbar-search">
+      <input type="text" id="main-search" placeholder="Search contacts...">
+    </div>
+    <div class="toolbar-actions">
+      <button type="button" class="icon-btn" id="btn-tray-toggle" title="Tray Popup (preview)">⬇️</button>
+      <button type="button" class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+      <span class="contact-count" id="contact-count">0 contacts</span>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="page-settings" class="page hidden">
+    <div class="settings-container">
+      <div class="settings-header">
+        <button type="button" class="back-btn" id="btn-back-settings">← Back</button>
+        <h2>⚙️ Settings</h2>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-label">🔑 Global Hotkey</h3>
+        <div class="hotkey-display">
+          <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>
+          <button type="button" class="btn-secondary btn-sm" disabled>Change</button>
+        </div>
+        <p class="settings-hint">Hotkey configuration available in Tauri build.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-label">📦 Data</h3>
+        <div class="settings-actions-row">
+          <button type="button" class="btn-primary" id="btn-export">Export Contacts (JSON)</button>
+          <button type="button" class="btn-secondary" id="btn-import">Import Contacts (JSON)</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-label">🗄 Storage</h3>
+        <p class="settings-path">~/.kaibook/contacts.json</p>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-label">ℹ️ About</h3>
+        <p class="settings-info">KaiBook v0.1.0 · MIT License</p>
+        <div class="settings-links">
+          <a href="#" class="link">GitHub</a>
+          <a href="#" class="link">Report Issue</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LIST PAGE -->
+  <div id="page-main" class="page">
+    <div class="contact-list" id="contact-list"></div>
+    <button type="button" class="add-contact-btn" id="btn-add-contact">+ Add New Contact</button>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" class="empty-state hidden">
+    <div class="empty-icon">📇</div>
+    <h2>No contacts yet</h2>
+    <p>Add your first client and see their live local time.</p>
+    <button type="button" class="btn-primary" id="btn-add-first">+ Add New Contact</button>
+  </div>
+
+  <!-- ==================== MODAL ==================== -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 id="modal-title">✏️ Add Contact</h2>
+        <button type="button" class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <form id="contact-form">
+        <input type="hidden" id="form-id">
+        <div class="form-group">
+          <label for="form-name">Full Name <span class="required">*</span></label>
+          <input type="text" id="form-name" required placeholder="Alice Chen">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-email-primary">Primary Email</label>
+            <input type="email" id="form-email-primary" placeholder="alice@company.com">
+          </div>
+          <div class="form-group">
+            <label for="form-email-secondary">Secondary Email</label>
+            <input type="email" id="form-email-secondary" placeholder="alice@gmail.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-phone-primary">Primary Phone</label>
+            <input type="text" id="form-phone-primary" placeholder="+1 (555) 123-4567">
+          </div>
+          <div class="form-group">
+            <label for="form-phone-secondary">Secondary Phone</label>
+            <input type="text" id="form-phone-secondary" placeholder="+1 (555) 987-6543">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="form-address">Address</label>
+          <input type="text" id="form-address" placeholder="350 Fifth Avenue, New York, NY 10118">
+        </div>
+        <div class="form-group">
+          <label for="form-timezone">Timezone <span class="required">*</span></label>
+          <select id="form-timezone" required>
+            <option value="">-- Select timezone --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="form-notes">Notes</label>
+          <textarea id="form-notes" rows="2" placeholder="Any notes about this client..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">💾 Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== CONFIRM DIALOG ==================== -->
+  <div id="confirm-overlay" class="modal-overlay hidden">
+    <div class="confirm-window">
+      <p id="confirm-message">Are you sure?</p>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" id="btn-confirm-cancel">Cancel</button>
+        <button type="button" class="btn-danger" id="btn-confirm-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
