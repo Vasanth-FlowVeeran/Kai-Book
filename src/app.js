@@ -168,10 +168,6 @@ function startLiveClock() {
       const tz = el.dataset.timezone;
       if (tz) el.textContent = formatTime(tz);
     });
-    document.querySelectorAll(".tray-contact-time").forEach((el) => {
-      const tz = el.dataset.timezone;
-      if (tz) el.textContent = formatTime(tz);
-    });
   }, 1000);
 }
 
@@ -210,33 +206,6 @@ function bindEvents() {
 
   document.getElementById("contact-form").addEventListener("submit", handleFormSubmit);
 
-  document.getElementById("btn-tray-toggle").addEventListener("click", toggleTrayPopup);
-  document.getElementById("tray-open-main").addEventListener("click", () => {
-    document.getElementById("tray-popup").classList.add("hidden");
-  });
-  document.getElementById("tray-quick-add").addEventListener("click", async () => {
-    const quickInput = prompt("Quick Add: name | email | phone | timezone");
-    if (!quickInput) return;
-    const parts = quickInput.split("|").map((s) => s.trim());
-    if (parts.length < 2) return;
-    contacts.push({
-      id: generateId(),
-      name: parts[0] || "",
-      emailPrimary: parts[1] || "",
-      emailSecondary: "",
-      phonePrimary: parts[2] || "",
-      phoneSecondary: "",
-      address: "",
-      timezone: parts[3] || "",
-      notes: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-    await saveContacts();
-    renderAll();
-  });
-  document.getElementById("tray-search-input").addEventListener("input", () => renderTrayPopup());
-
   document.getElementById("btn-settings").addEventListener("click", () => showPage("settings"));
   document.getElementById("btn-back-settings").addEventListener("click", () => showPage("main"));
 
@@ -258,10 +227,6 @@ function bindEvents() {
     if (e.target === e.currentTarget) closeConfirm();
   });
 
-  document.getElementById("tray-popup").addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) document.getElementById("tray-popup").classList.add("hidden");
-  });
-
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (!document.getElementById("confirm-overlay").classList.contains("hidden")) {
@@ -278,7 +243,6 @@ function bindEvents() {
 // ============================================
 function renderAll() {
   renderContacts();
-  renderTrayPopup();
   updateContactCount();
 }
 
@@ -354,56 +318,6 @@ function renderContacts() {
       if (contact) confirmDelete(contact);
     });
   });
-}
-
-// ============================================
-// TRAY POPUP
-// ============================================
-function toggleTrayPopup() {
-  const popup = document.getElementById("tray-popup");
-  popup.classList.toggle("hidden");
-  if (!popup.classList.contains("hidden")) {
-    renderTrayPopup();
-    document.getElementById("tray-search-input").focus();
-  }
-}
-
-function renderTrayPopup() {
-  const trayList = document.getElementById("tray-contact-list");
-  const traySearchInput = document.getElementById("tray-search-input");
-  const trayQuery = (traySearchInput?.value || "").toLowerCase();
-
-  const filtered = trayQuery
-    ? contacts.filter((c) => c.name.toLowerCase().includes(trayQuery))
-    : contacts;
-
-  trayList.innerHTML = filtered
-    .map(
-      (c) => `
-    <div class="tray-contact-item" data-id="${c.id}">
-      <div class="tray-contact-name">${escapeHtml(c.name)}</div>
-      <div class="tray-contact-time" data-timezone="${escapeHtml(c.timezone)}">${formatTime(c.timezone)}</div>
-    </div>
-  `
-    )
-    .join("");
-
-  trayList.querySelectorAll(".tray-contact-item").forEach((item) => {
-    item.addEventListener("click", (e) => {
-      const id = item.dataset.id;
-      const contact = contacts.find((c) => c.id === id);
-      if (contact) {
-        navigator.clipboard
-          .writeText(contact.emailPrimary || contact.phonePrimary || contact.name)
-          .then(() => {
-            item.style.background = "var(--accent-subtle)";
-            setTimeout(() => (item.style.background = ""), 600);
-          })
-          .catch(() => {});
-      }
-    });
-  });
-
 }
 
 // ============================================
