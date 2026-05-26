@@ -84,7 +84,8 @@ fn load_theme() -> Result<ThemeSettings, String> {
 #[tauri::command]
 fn save_theme(settings: ThemeSettings) -> Result<(), String> {
     let path = theme_path()?;
-    let json = serde_json::to_string_pretty(&settings).map_err(|e| format!("Serialize error: {e}"))?;
+    let json =
+        serde_json::to_string_pretty(&settings).map_err(|e| format!("Serialize error: {e}"))?;
     fs::write(&path, json).map_err(|e| format!("Write error: {e}"))?;
     Ok(())
 }
@@ -220,16 +221,38 @@ pub fn run() {
                                     // Position popup below tray icon
                                     if let Ok(Some(rect)) = tray.rect() {
                                         let (px, py) = match rect.position {
-                                            tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
+                                            tauri::Position::Physical(p) => {
+                                                (p.x as f64, p.y as f64)
+                                            }
                                             tauri::Position::Logical(l) => (l.x, l.y),
                                         };
                                         let (sw, sh) = match rect.size {
-                                            tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
+                                            tauri::Size::Physical(p) => {
+                                                (p.width as f64, p.height as f64)
+                                            }
                                             tauri::Size::Logical(l) => (l.width, l.height),
                                         };
-                                        let x = px - 160.0 + (sw / 2.0);
-                                        let y = py + sh;
-                                        let _ = popup.set_position(PhysicalPosition::new(x as i32, y as i32));
+                                        let (x, y) = {
+                                            #[cfg(target_os = "windows")]
+                                            {
+                                                // On Windows, position the popup above the tray icon
+                                                let popup_height =
+                                                    popup.outer_size().unwrap().height as f64;
+                                                let x = px - 160.0 + (sw / 2.0);
+                                                let y = py - popup_height; // Position above the tray icon
+                                                (x, y)
+                                            }
+                                            #[cfg(not(target_os = "windows"))]
+                                            {
+                                                // Default behavior for other OS: position below the tray icon
+                                                let x = px - 160.0 + (sw / 2.0);
+                                                let y = py + sh;
+                                                (x, y)
+                                            }
+                                        };
+                                        let _ = popup.set_position(PhysicalPosition::new(
+                                            x as i32, y as i32,
+                                        ));
                                     }
                                     let _ = popup.show();
                                     let _ = popup.set_focus();
