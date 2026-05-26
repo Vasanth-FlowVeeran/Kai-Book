@@ -232,24 +232,8 @@ pub fn run() {
                                             }
                                             tauri::Size::Logical(l) => (l.width, l.height),
                                         };
-                                        let (x, y) = {
-                                            #[cfg(target_os = "windows")]
-                                            {
-                                                // On Windows, position the popup above the tray icon
-                                                let popup_height =
-                                                    popup.outer_size().unwrap().height as f64;
-                                                let x = px - 160.0 + (sw / 2.0);
-                                                let y = py - popup_height; // Position above the tray icon
-                                                (x, y)
-                                            }
-                                            #[cfg(not(target_os = "windows"))]
-                                            {
-                                                // Default behavior for other OS: position below the tray icon
-                                                let x = px - 160.0 + (sw / 2.0);
-                                                let y = py + sh;
-                                                (x, y)
-                                            }
-                                        };
+                                        let x = px - 160.0 + (sw / 2.0);
+                                        let y = py + sh; // Position below the tray icon
                                         let _ = popup.set_position(PhysicalPosition::new(
                                             x as i32, y as i32,
                                         ));
