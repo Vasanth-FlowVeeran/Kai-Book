@@ -623,6 +623,19 @@ function bindEvents() {
   });
 
   document.getElementById("btn-export").addEventListener("click", exportContacts);
+  document.getElementById("btn-nuke-contacts").addEventListener("click", openNukeConfirm);
+  document.getElementById("btn-nuke-cancel").addEventListener("click", closeNukeConfirm);
+  document.getElementById("btn-nuke-ok").addEventListener("click", executeNuke);
+  document.getElementById("nuke-overlay").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeNukeConfirm();
+  });
+  document.getElementById("nuke-input").addEventListener("input", (e) => {
+    const val = e.target.value.trim();
+    const btn = document.getElementById("btn-nuke-ok");
+    const matched = val === "CONFIRM";
+    btn.disabled = !matched;
+    e.target.classList.toggle("matched", matched);
+  });
   document.getElementById("btn-import").addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -642,7 +655,9 @@ function bindEvents() {
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (!document.getElementById("confirm-overlay").classList.contains("hidden")) {
+      if (!document.getElementById("nuke-overlay").classList.contains("hidden")) {
+        closeNukeConfirm();
+      } else if (!document.getElementById("confirm-overlay").classList.contains("hidden")) {
         closeConfirm();
       } else if (!document.getElementById("modal-overlay").classList.contains("hidden")) {
         closeModal();
@@ -1435,6 +1450,39 @@ function importContacts(e) {
     }
   };
   reader.readAsText(file);
+}
+
+// ============================================
+// NUKE ALL CONTACTS
+// ============================================
+function openNukeConfirm() {
+  document.getElementById("nuke-count").textContent = contacts.length;
+  document.getElementById("nuke-input").value = "";
+  document.getElementById("nuke-input").classList.remove("matched");
+  document.getElementById("btn-nuke-ok").disabled = true;
+  document.getElementById("nuke-overlay").classList.remove("hidden");
+  setTimeout(() => document.getElementById("nuke-input").focus(), 100);
+}
+
+function closeNukeConfirm() {
+  const overlay = document.getElementById("nuke-overlay");
+  overlay.classList.add("closing");
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("closing");
+    document.getElementById("nuke-input").value = "";
+    document.getElementById("nuke-input").classList.remove("matched");
+  }, 150);
+}
+
+async function executeNuke() {
+  contacts = [];
+  await saveContacts();
+  closeNukeConfirm();
+  renderAll();
+  if (IS_TAURI) {
+    window.__TAURI__.event.emit("refresh-contacts", {});
+  }
 }
 
 // ============================================

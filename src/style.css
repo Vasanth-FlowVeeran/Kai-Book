@@ -1547,6 +1547,88 @@ body.is-dragging * {
   font-style: italic;
 }
 
+/* Danger zone in Data settings */
+.setting-danger-zone {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--paper-shadow);
+}
+
+/* Nuke confirm dialog */
+.nuke-confirm {
+  max-width: 360px;
+  text-align: center;
+}
+.nuke-icon svg {
+  color: var(--red-leather);
+}
+.nuke-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.nuke-desc {
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin: 6px 0 14px;
+  line-height: 1.5;
+}
+.nuke-desc strong {
+  color: var(--ink);
+}
+.nuke-prompt {
+  font-size: 12px;
+  color: var(--ink-light);
+  margin-bottom: 8px;
+}
+.nuke-prompt strong {
+  font-family: var(--font-mono, monospace);
+  color: var(--red-leather);
+  letter-spacing: 0.05em;
+}
+.nuke-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--paper-shadow);
+  border-radius: var(--radius);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.08em;
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+  margin-bottom: 16px;
+}
+.nuke-input:focus {
+  border-color: var(--red-leather);
+  box-shadow: 0 0 0 2px rgba(139,58,58,0.15);
+}
+.nuke-input.matched {
+  border-color: var(--red-leather);
+  background: rgba(139,58,58,0.06);
+}
+
+/* Dark mode nuke */
+body.dark-mode .nuke-desc strong { color: var(--ink); }
+body.dark-mode .nuke-input {
+  background: var(--paper-dark);
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+body.dark-mode .nuke-input:focus {
+  border-color: #d88;
+  box-shadow: 0 0 0 2px rgba(200,100,100,0.15);
+}
+body.dark-mode .nuke-input.matched {
+  border-color: #d88;
+  background: rgba(200,100,100,0.08);
+}
+body.dark-mode .setting-danger-zone {
+  border-top-color: var(--ink-faint);
+}
+
 /* ============================================
    Dark Mode Toggle Button
    ============================================ */

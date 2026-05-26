@@ -139,6 +139,12 @@
           <button type="button" class="btn btn-primary" id="btn-export">Export JSON</button>
           <button type="button" class="btn btn-ghost" id="btn-import">Import JSON</button>
         </div>
+        <div class="setting-danger-zone">
+          <button type="button" class="btn btn-danger" id="btn-nuke-contacts">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Remove All Contacts
+          </button>
+        </div>
       </div>
 
       <div class="setting-card">
@@ -269,6 +275,23 @@
       <div class="confirm-actions">
         <button type="button" class="btn btn-ghost" id="btn-confirm-cancel">Cancel</button>
         <button type="button" class="btn btn-danger" id="btn-confirm-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NUKE CONFIRM ==================== -->
+  <div id="nuke-overlay" class="modal-overlay hidden">
+    <div class="confirm nuke-confirm">
+      <div class="confirm-icon nuke-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <p class="confirm-text nuke-title">Delete all contacts?</p>
+      <p class="nuke-desc">This will permanently remove all <strong id="nuke-count">0</strong> contacts. This cannot be undone.</p>
+      <p class="nuke-prompt">Type <strong>CONFIRM</strong> to proceed:</p>
+      <input type="text" id="nuke-input" class="nuke-input" placeholder="Type CONFIRM" spellcheck="false" autocomplete="off">
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" id="btn-nuke-cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-nuke-ok" disabled>Delete Everything</button>
       </div>
     </div>
   </div>
