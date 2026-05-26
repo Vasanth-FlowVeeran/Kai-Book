@@ -984,6 +984,7 @@ body[data-theme="cyberpunk"]:not(.dark-mode) .card-avatar {
   border-color: rgba(200,150,60,0.25);
 }
 body[data-theme="cyberpunk"]:not(.dark-mode) .tod-badge {
+  background: #0a0a14;
   box-shadow: 0 0 0 2px #f2efea;
 }
 body[data-theme="cyberpunk"]:not(.dark-mode) .card-action {

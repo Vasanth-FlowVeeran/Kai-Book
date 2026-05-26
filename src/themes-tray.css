@@ -384,6 +384,7 @@ body[data-theme="cyberpunk"]:not(.dark-mode) .avatar {
   border-color: rgba(200,150,60,0.2);
 }
 body[data-theme="cyberpunk"]:not(.dark-mode) .tod-badge {
+  background: #0a0a14;
   box-shadow: 0 0 0 1.5px var(--paper);
 }
 body[data-theme="cyberpunk"]:not(.dark-mode) .time-badge {
