@@ -18,7 +18,7 @@
         "title": "KaiBook",
         "url": "index.html",
         "width": 680,
-        "height": 720,
+        "height": 800,
         "minWidth": 400,
         "minHeight": 500,
         "center": true,
@@ -59,6 +59,7 @@
   "plugins": {
     "fs": {
       "requireLiteralLeadingDot": false
-    }
+    },
+    "opener": {}
   }
 }

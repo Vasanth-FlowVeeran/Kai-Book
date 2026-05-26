@@ -4,6 +4,7 @@
 
 // Detect Tauri environment
 const IS_TAURI = Boolean(window.__TAURI_INTERNALS__);
+let _onboardingComplete = true; // assume true; overridden in initTheme
 
 async function tauriInvoke(cmd, args = {}) {
   if (!IS_TAURI) return null;
@@ -76,8 +77,12 @@ const ICON = {
   phone: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
   globe: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/></svg>',
   mapPin: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  compose: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
   edit: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
   trash: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>',
+  star: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  starFill: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  tag: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
 };
 
 // ============================================
@@ -246,6 +251,8 @@ const MOCK_CONTACTS = [
 // STATE
 // ============================================
 let contacts = [];
+let groups = []; // ContactGroup[]  { id, name, color }
+let activeTab = "all"; // "all" | "favorites" | group id
 let searchQuery = "";
 let editingId = null;
 let confirmCallback = null;
@@ -253,6 +260,11 @@ let currentPage = 0;
 const PAGE_SIZE = 10;
 const MAX_PAGES = 2;
 const MAX_CONTACTS = MAX_PAGES * PAGE_SIZE;
+
+const GROUP_COLORS = [
+  "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6",
+  "#ec4899", "#06b6d4", "#f97316", "#6366f1", "#14b8a6",
+];
 
 // ============================================
 // THEME (dark mode + UI themes)
@@ -276,6 +288,7 @@ async function initTheme() {
       if (settings) {
         darkMode = settings.darkMode;
         uiTheme = settings.uiTheme || "skeuomorphic";
+        _onboardingComplete = !!settings.onboardingComplete;
       }
     } catch (e) { console.warn("load_theme failed:", e); }
   }
@@ -298,7 +311,7 @@ function toggleTheme() {
   syncNativeTheme();
   // Persist to shared file
   if (IS_TAURI) {
-    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: uiTheme } });
+    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: uiTheme, onboardingComplete: _onboardingComplete } });
     // Notify tray popup immediately
     window.__TAURI__.event.emit("theme-changed", {
       theme: isDark ? "dark" : "light",
@@ -318,7 +331,7 @@ function setUITheme(themeName) {
   renderContacts();
   // Persist to shared file
   if (IS_TAURI) {
-    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: themeName } });
+    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: themeName, onboardingComplete: _onboardingComplete } });
     // Notify tray popup immediately
     window.__TAURI__.event.emit("theme-changed", {
       theme: isDark ? "dark" : "light",
@@ -333,10 +346,17 @@ function setUITheme(themeName) {
 async function init() {
   await initTheme();
   await loadContacts();
+  await loadGroups();
   populateTimezoneDropdown();
   startLiveClock();
   bindEvents();
+  renderTabs();
   renderAll();
+
+  // Show onboarding on first launch
+  if (!_onboardingComplete) {
+    showOnboarding();
+  }
 }
 
 async function loadContacts() {
@@ -377,6 +397,32 @@ async function saveContacts() {
     }
   } else {
     localStorage.setItem("kaibook_contacts", JSON.stringify(contacts));
+  }
+}
+
+// ============================================
+// GROUPS PERSISTENCE
+// ============================================
+async function loadGroups() {
+  if (IS_TAURI) {
+    try {
+      const loaded = await tauriInvoke("load_groups");
+      if (loaded) groups = loaded;
+    } catch (e) { console.warn("load_groups failed:", e); }
+  } else {
+    try {
+      const stored = localStorage.getItem("kaibook_groups");
+      if (stored) groups = JSON.parse(stored);
+    } catch (e) { /* ignore */ }
+  }
+}
+
+async function saveGroups() {
+  if (IS_TAURI) {
+    try { await tauriInvoke("save_groups", { groups }); }
+    catch (e) { console.error("save_groups failed:", e); }
+  } else {
+    localStorage.setItem("kaibook_groups", JSON.stringify(groups));
   }
 }
 
@@ -551,6 +597,11 @@ function bindEvents() {
   document.getElementById("btn-add-contact").addEventListener("click", () => openForm());
   document.getElementById("btn-add-first").addEventListener("click", () => openForm());
 
+  // Tab bar — All and Favorites
+  document.querySelector('.tab[data-tab="all"]').addEventListener("click", () => switchTab("all"));
+  document.querySelector('.tab[data-tab="favorites"]').addEventListener("click", () => switchTab("favorites"));
+  document.getElementById("tab-add-group").addEventListener("click", createGroupInline);
+
   document.getElementById("btn-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-close").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", (e) => {
@@ -601,6 +652,250 @@ function bindEvents() {
 }
 
 // ============================================
+// TABS — Groups & Favorites
+// ============================================
+function renderTabs() {
+  const scroll = document.getElementById("tab-scroll");
+  // Keep All and Favorites, remove old dynamic tabs
+  const dynamicTabs = scroll.querySelectorAll(".tab-group");
+  dynamicTabs.forEach(t => t.remove());
+
+  // Add group tabs
+  groups.forEach(g => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tab tab-group" + (activeTab === g.id ? " active" : "");
+    btn.dataset.tab = g.id;
+    btn.innerHTML = `<span class="tab-dot" style="background:${escapeHtml(g.color)}"></span>${escapeHtml(g.name)}`;
+    btn.addEventListener("click", () => switchTab(g.id));
+    btn.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      showTabContextMenu(e, g);
+    });
+    scroll.appendChild(btn);
+  });
+
+  // Update active states on All and Favorites
+  scroll.querySelectorAll(".tab").forEach(t => {
+    if (!t.classList.contains("tab-group")) {
+      t.classList.toggle("active", t.dataset.tab === activeTab);
+    }
+  });
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  currentPage = 0;
+  renderTabs();
+  renderContacts();
+}
+
+function showTabContextMenu(e, group) {
+  closeAllDropdowns();
+  const menu = document.createElement("div");
+  menu.className = "tab-context";
+  menu.style.left = e.clientX + "px";
+  menu.style.top = e.clientY + "px";
+  menu.innerHTML = `
+    <button type="button" class="tab-context-item" data-action="rename">
+      ${ICON.edit} Rename
+    </button>
+    <button type="button" class="tab-context-item tab-context-item--danger" data-action="delete">
+      ${ICON.trash} Delete Group
+    </button>
+  `;
+  menu.querySelector('[data-action="rename"]').addEventListener("click", () => {
+    menu.remove();
+    renameGroup(group);
+  });
+  menu.querySelector('[data-action="delete"]').addEventListener("click", () => {
+    menu.remove();
+    deleteGroup(group);
+  });
+  document.body.appendChild(menu);
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener("click", function handler() {
+      menu.remove();
+      document.removeEventListener("click", handler);
+    }, { once: true });
+  }, 0);
+}
+
+function createGroupInline() {
+  // If there's already an inline input, focus it
+  const existing = document.getElementById("tab-new-input");
+  if (existing) { existing.focus(); return; }
+
+  const scroll = document.getElementById("tab-scroll");
+  const wrapper = document.createElement("div");
+  wrapper.className = "tab tab-new-wrapper";
+  wrapper.innerHTML = `<input id="tab-new-input" class="tab-new-input" type="text" placeholder="Group name…" spellcheck="false" maxlength="20">`;
+  scroll.appendChild(wrapper);
+
+  const input = wrapper.querySelector("input");
+  input.focus();
+
+  function commit() {
+    const name = input.value.trim();
+    wrapper.remove();
+    if (!name) return;
+    const g = {
+      id: "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      name: name,
+      color: GROUP_COLORS[groups.length % GROUP_COLORS.length],
+    };
+    groups.push(g);
+    saveGroups();
+    switchTab(g.id);
+    if (IS_TAURI) {
+      window.__TAURI__.event.emit("groups-changed", {});
+    }
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+    if (e.key === "Escape") { wrapper.remove(); }
+  });
+  input.addEventListener("blur", () => {
+    // Small delay so click on input doesn't count as blur
+    setTimeout(() => { if (document.body.contains(wrapper)) commit(); }, 120);
+  });
+}
+
+function renameGroup(group) {
+  // Find the tab button for this group and replace with inline input
+  const tabBtn = document.querySelector(`.tab-group[data-tab="${group.id}"]`);
+  if (!tabBtn) return;
+
+  const oldHtml = tabBtn.innerHTML;
+  tabBtn.innerHTML = `<input class="tab-new-input" type="text" value="${escapeHtml(group.name)}" spellcheck="false" maxlength="20">`;
+  const input = tabBtn.querySelector("input");
+  input.focus();
+  input.select();
+
+  function commit() {
+    const newName = input.value.trim();
+    if (newName) {
+      group.name = newName;
+      saveGroups();
+      if (IS_TAURI) {
+        window.__TAURI__.event.emit("groups-changed", {});
+      }
+    }
+    renderTabs();
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+    if (e.key === "Escape") { renderTabs(); }
+  });
+  input.addEventListener("blur", () => {
+    setTimeout(() => commit(), 120);
+  });
+}
+
+async function deleteGroup(group) {
+  // Remove group from all contacts that have it
+  contacts.forEach(c => {
+    if (c.groups) {
+      c.groups = c.groups.filter(gId => gId !== group.id);
+    }
+  });
+  groups = groups.filter(g => g.id !== group.id);
+  if (activeTab === group.id) activeTab = "all";
+  await saveContacts();
+  await saveGroups();
+  renderTabs();
+  renderAll();
+  if (IS_TAURI) {
+    window.__TAURI__.event.emit("groups-changed", {});
+    window.__TAURI__.event.emit("refresh-contacts", {});
+  }
+}
+
+async function toggleFavorite(contactId) {
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+  c.favorite = !c.favorite;
+  await saveContacts();
+  renderContacts();
+  if (IS_TAURI) {
+    window.__TAURI__.event.emit("refresh-contacts", {});
+  }
+}
+
+async function toggleContactGroup(contactId, groupId) {
+  const c = contacts.find(x => x.id === contactId);
+  if (!c) return;
+  if (!c.groups) c.groups = [];
+  const idx = c.groups.indexOf(groupId);
+  if (idx === -1) {
+    c.groups.push(groupId);
+  } else {
+    c.groups.splice(idx, 1);
+  }
+  await saveContacts();
+  renderContacts();
+  if (IS_TAURI) {
+    window.__TAURI__.event.emit("refresh-contacts", {});
+  }
+}
+
+function showGroupDropdown(btn, contactId) {
+  closeAllDropdowns();
+  const card = btn.closest(".card");
+  const dd = document.createElement("div");
+  dd.className = "group-dropdown";
+  const contact = contacts.find(x => x.id === contactId);
+  const contactGroups = (contact && contact.groups) || [];
+
+  if (groups.length === 0) {
+    dd.innerHTML = `<div style="padding:8px;font-size:11px;color:var(--ink-muted);text-align:center;">No groups yet. Create one with the + tab.</div>`;
+  } else {
+    dd.innerHTML = groups.map(g => {
+      const checked = contactGroups.includes(g.id);
+      return `<button type="button" class="group-dropdown-item${checked ? " checked" : ""}" data-group-id="${g.id}">
+        <span class="gd-dot" style="background:${escapeHtml(g.color)}"></span>
+        ${escapeHtml(g.name)}
+        <svg class="gd-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>`;
+    }).join("");
+  }
+
+  card.appendChild(dd);
+
+  dd.querySelectorAll(".group-dropdown-item").forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleContactGroup(contactId, item.dataset.groupId);
+      dd.remove();
+    });
+  });
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener("click", function handler(e) {
+      if (!dd.contains(e.target)) {
+        dd.remove();
+        document.removeEventListener("click", handler);
+      }
+    });
+  }, 0);
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll(".group-dropdown, .tab-context").forEach(d => d.remove());
+}
+
+function filterContactsByTab(list) {
+  if (activeTab === "all") return list;
+  if (activeTab === "favorites") return list.filter(c => c.favorite);
+  // Group filter
+  return list.filter(c => c.groups && c.groups.includes(activeTab));
+}
+
+// ============================================
 // RENDER
 // ============================================
 function renderAll() {
@@ -609,16 +904,26 @@ function renderAll() {
 }
 
 function updateContactCount() {
-  document.getElementById("contact-count").textContent =
-    `${contacts.length} contact${contacts.length !== 1 ? "s" : ""}`;
+  const tabFiltered = filterContactsByTab(contacts);
+  const total = contacts.length;
+  const showing = tabFiltered.length;
+  if (activeTab === "all") {
+    document.getElementById("contact-count").textContent =
+      `${total} contact${total !== 1 ? "s" : ""}`;
+  } else {
+    document.getElementById("contact-count").textContent =
+      `${showing} of ${total} contact${total !== 1 ? "s" : ""}`;
+  }
 }
 
 function renderContacts() {
   const list = document.getElementById("contact-list");
   const empty = document.getElementById("empty-state");
 
+  // Apply tab filter first, then search
+  const tabFiltered = filterContactsByTab(contacts);
   const filtered = searchQuery
-    ? contacts.filter(
+    ? tabFiltered.filter(
         (c) =>
           c.name.toLowerCase().includes(searchQuery) ||
           (c.emailPrimary || "").toLowerCase().includes(searchQuery) ||
@@ -627,7 +932,7 @@ function renderContacts() {
           (c.address || "").toLowerCase().includes(searchQuery) ||
           (c.notes || "").toLowerCase().includes(searchQuery)
       )
-    : contacts;
+    : tabFiltered;
 
   // Cap to max contacts
   const capped = filtered.slice(0, MAX_CONTACTS);
@@ -649,7 +954,7 @@ function renderContacts() {
   empty.classList.add("hidden");
 
   const cards = pageItems
-    .map((c) => {
+    .map((c, idx) => {
       // Build subtitle line (email + phone)
       const subParts = [];
       if (c.emailPrimary) {
@@ -683,8 +988,16 @@ function renderContacts() {
         ? `<div class="card-details">${tags.join("")}</div>`
         : "";
 
+      // Group badges for this contact
+      const contactGroupBadges = (c.groups || []).map(gId => {
+        const g = groups.find(x => x.id === gId);
+        if (!g) return "";
+        return `<span class="card-tag" style="border-color:${g.color}30;background:${g.color}12"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.color};margin-right:3px"></span>${escapeHtml(g.name)}</span>`;
+      }).join("");
+
       return `
-      <div class="card" data-id="${c.id}">
+      <div class="card" data-id="${c.id}" style="animation-delay:${idx * 30}ms">
+        <div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>
         <div class="card-top">
           <div class="card-avatar-wrap">
             <div class="card-avatar" style="background:${avatarGradient(c.name)}">${initial(c.name)}</div>
@@ -697,7 +1010,11 @@ function renderContacts() {
           <div class="card-time" data-timezone="${escapeHtml(c.timezone || "")}">${c.timezone ? formatTime(c.timezone) : "--:--"}</div>
         </div>
         ${detailSection}
+        ${contactGroupBadges ? `<div class="card-details card-group-badges">${contactGroupBadges}</div>` : ""}
         <div class="card-actions">
+          <button type="button" class="card-action favorite${c.favorite ? " is-fav" : ""}" data-id="${c.id}" title="Favorite">${c.favorite ? ICON.starFill : ICON.star}</button>
+          <button type="button" class="card-action group-assign" data-id="${c.id}" title="Assign to group">${ICON.tag}</button>
+          ${c.emailPrimary ? `<button type="button" class="card-action email" data-email="${escapeHtml(c.emailPrimary)}" data-name="${escapeHtml(c.name)}" title="Compose email">${ICON.compose}</button>` : ""}
           <button type="button" class="card-action edit" data-id="${c.id}" title="Edit">${ICON.edit}</button>
           <button type="button" class="card-action delete" data-id="${c.id}" title="Delete">${ICON.trash}</button>
         </div>
@@ -725,6 +1042,21 @@ function renderContacts() {
   list.innerHTML = cards + paginationHtml;
 
   // Bind card action buttons
+  list.querySelectorAll(".card-action.email").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const email = e.currentTarget.dataset.email;
+      const name = e.currentTarget.dataset.name;
+      const subject = encodeURIComponent(`Hi ${name}`);
+      const url = `mailto:${email}?subject=${subject}`;
+      if (IS_TAURI) {
+        tauriInvoke("open_url", { url });
+      } else {
+        window.location.href = url;
+      }
+    });
+  });
+
   list.querySelectorAll(".card-action.edit").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
@@ -741,6 +1073,25 @@ function renderContacts() {
     });
   });
 
+  // Bind favorite toggle
+  list.querySelectorAll(".card-action.favorite").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite(e.currentTarget.dataset.id);
+    });
+  });
+
+  // Bind group assign
+  list.querySelectorAll(".card-action.group-assign").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showGroupDropdown(e.currentTarget, e.currentTarget.dataset.id);
+    });
+  });
+
+  // Bind drag-to-reorder
+  bindDragReorder(list);
+
   // Bind pagination buttons
   const prevBtn = document.getElementById("page-prev");
   const nextBtn = document.getElementById("page-next");
@@ -754,6 +1105,166 @@ function renderContacts() {
       if (currentPage < totalPages - 1) { currentPage++; renderContacts(); }
     });
   }
+}
+
+// ============================================
+// DRAG TO REORDER (mouse-event based)
+// ============================================
+
+// Shared drag state — lives outside bindDragReorder so mousemove/mouseup
+// on document can reference it even after a re-render.
+let _drag = null;
+
+function _ensureDropLine() {
+  let line = document.getElementById("drag-drop-line");
+  if (!line) {
+    line = document.createElement("div");
+    line.id = "drag-drop-line";
+    line.className = "drag-drop-line";
+    document.body.appendChild(line);
+  }
+  return line;
+}
+
+function _cleanupDrag() {
+  if (!_drag) return;
+  if (_drag.ghost && _drag.ghost.parentNode) _drag.ghost.remove();
+  if (_drag.srcCard) _drag.srcCard.classList.remove("dragging");
+  const line = document.getElementById("drag-drop-line");
+  if (line) line.classList.remove("visible");
+  document.body.classList.remove("is-dragging");
+  _drag = null;
+}
+
+// Runs once — attaches the global mousemove / mouseup that drive every drag.
+let _dragGlobalBound = false;
+function _bindDragGlobal() {
+  if (_dragGlobalBound) return;
+  _dragGlobalBound = true;
+
+  document.addEventListener("mousemove", (e) => {
+    if (!_drag) return;
+    e.preventDefault();
+
+    // Move ghost
+    _drag.ghost.style.left = (e.clientX - _drag.offsetX) + "px";
+    _drag.ghost.style.top  = (e.clientY - _drag.offsetY) + "px";
+
+    // Find which card we're over
+    const cards = Array.from(_drag.list.querySelectorAll(".card"));
+    const line = _ensureDropLine();
+    let placed = false;
+
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards[i];
+      if (c.dataset.id === _drag.contactId) continue;
+      const rect = c.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+
+      if (e.clientY < midY) {
+        // Insert BEFORE this card — line goes above it
+        line.style.top = (rect.top - 1) + "px";
+        line.style.left = rect.left + "px";
+        line.style.width = rect.width + "px";
+        line.classList.add("visible");
+        _drag.dropBeforeId = c.dataset.id;
+        _drag.dropAfter = false;
+        placed = true;
+        break;
+      } else if (i === cards.length - 1 || (e.clientY >= midY && (i + 1 >= cards.length || e.clientY < cards[i + 1].getBoundingClientRect().top + cards[i + 1].getBoundingClientRect().height / 2))) {
+        // Insert AFTER this card — line goes below it
+        line.style.top = (rect.bottom + 1) + "px";
+        line.style.left = rect.left + "px";
+        line.style.width = rect.width + "px";
+        line.classList.add("visible");
+        _drag.dropBeforeId = c.dataset.id;
+        _drag.dropAfter = true;
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      line.classList.remove("visible");
+      _drag.dropBeforeId = null;
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (!_drag) return;
+
+    const fromId = _drag.contactId;
+    const toId = _drag.dropBeforeId;
+    const dropAfter = _drag.dropAfter;
+
+    _cleanupDrag();
+
+    if (!toId || fromId === toId) return;
+
+    const fromIdx = contacts.findIndex(c => c.id === fromId);
+    if (fromIdx === -1) return;
+
+    // Remove from old position
+    const [moved] = contacts.splice(fromIdx, 1);
+    // Find target
+    let toIdx = contacts.findIndex(c => c.id === toId);
+    if (toIdx === -1) { contacts.push(moved); } else {
+      if (dropAfter) toIdx++;
+      contacts.splice(toIdx, 0, moved);
+    }
+
+    saveContacts();
+    renderContacts();
+    if (IS_TAURI) {
+      window.__TAURI__.event.emit("refresh-contacts", {});
+    }
+  });
+}
+
+function bindDragReorder(list) {
+  _bindDragGlobal();
+
+  list.querySelectorAll(".card").forEach(card => {
+    const handle = card.querySelector(".drag-handle");
+    if (!handle) return;
+
+    handle.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rect = card.getBoundingClientRect();
+
+      // Create a floating ghost clone
+      const ghost = card.cloneNode(true);
+      ghost.className = "card drag-ghost";
+      ghost.style.position = "fixed";
+      ghost.style.width = rect.width + "px";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      ghost.style.zIndex = "9999";
+      ghost.style.pointerEvents = "none";
+      ghost.style.opacity = "0.85";
+      ghost.style.transform = "scale(1.02) rotate(1deg)";
+      ghost.style.boxShadow = "0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12)";
+      ghost.style.transition = "none";
+      ghost.style.animation = "none";
+      document.body.appendChild(ghost);
+
+      card.classList.add("dragging");
+      document.body.classList.add("is-dragging");
+
+      _drag = {
+        contactId: card.dataset.id,
+        srcCard: card,
+        ghost: ghost,
+        list: list,
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top,
+        dropBeforeId: null,
+        dropAfter: false,
+      };
+    });
+  });
 }
 
 // ============================================
@@ -785,8 +1296,13 @@ function openForm(contact = null) {
 }
 
 function closeModal() {
-  document.getElementById("modal-overlay").classList.add("hidden");
-  editingId = null;
+  const overlay = document.getElementById("modal-overlay");
+  overlay.classList.add("closing");
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("closing");
+    editingId = null;
+  }, 180);
 }
 
 async function handleFormSubmit(e) {
@@ -850,16 +1366,33 @@ function confirmDelete(contact) {
 }
 
 function closeConfirm() {
-  document.getElementById("confirm-overlay").classList.add("hidden");
-  confirmCallback = null;
+  const overlay = document.getElementById("confirm-overlay");
+  overlay.classList.add("closing");
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("closing");
+    confirmCallback = null;
+  }, 150);
 }
 
 // ============================================
 // SETTINGS: EXPORT / IMPORT
 // ============================================
 function showPage(page) {
-  document.getElementById("page-main").classList.toggle("hidden", page !== "main");
-  document.getElementById("page-settings").classList.toggle("hidden", page !== "settings");
+  const main = document.getElementById("page-main");
+  const settings = document.getElementById("page-settings");
+  const tabBar = document.getElementById("tab-bar");
+  // Remove hidden from the incoming page, add to outgoing
+  main.classList.toggle("hidden", page !== "main");
+  settings.classList.toggle("hidden", page !== "settings");
+  // Hide tab bar on settings page
+  tabBar.classList.toggle("hidden", page !== "main");
+  // Re-trigger fade-in animation on the visible page
+  const active = page === "main" ? main : settings;
+  active.style.animation = "none";
+  // Force reflow to restart animation
+  void active.offsetHeight;
+  active.style.animation = "";
 }
 
 function exportContacts() {
@@ -915,6 +1448,110 @@ function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str || "";
   return div.innerHTML;
+}
+
+// ============================================
+// ONBOARDING
+// ============================================
+
+function showOnboarding() {
+  const overlay = document.getElementById("onboarding-overlay");
+  overlay.classList.remove("hidden");
+  // Sync dark-mode checkbox with current state
+  const darkCheck = document.getElementById("ob-dark-check");
+  darkCheck.checked = document.body.classList.contains("dark-mode");
+
+  // Sync active theme card
+  const currentTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+  document.querySelectorAll(".ob-theme-card").forEach(c => {
+    c.classList.toggle("active", c.dataset.theme === currentTheme);
+  });
+
+  bindOnboarding();
+}
+
+function bindOnboarding() {
+  const overlay = document.getElementById("onboarding-overlay");
+
+  // Step navigation — "Get Started" / "Next"
+  document.getElementById("ob-start").addEventListener("click", () => goToOnboardingStep(1));
+  document.getElementById("ob-theme-next").addEventListener("click", () => goToOnboardingStep(2));
+
+  // Back buttons
+  overlay.querySelectorAll(".onboarding-back").forEach(btn => {
+    btn.addEventListener("click", () => {
+      goToOnboardingStep(parseInt(btn.dataset.back, 10));
+    });
+  });
+
+  // Theme cards — live preview
+  document.querySelectorAll(".ob-theme-card").forEach(card => {
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".ob-theme-card").forEach(c => c.classList.remove("active"));
+      card.classList.add("active");
+      setUITheme(card.dataset.theme);
+    });
+  });
+
+  // Dark mode toggle
+  document.getElementById("ob-dark-check").addEventListener("change", (e) => {
+    if (e.target.checked) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+    syncNativeTheme();
+    // Persist
+    const isDark = e.target.checked;
+    const uiTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+    if (IS_TAURI) {
+      tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme, onboardingComplete: _onboardingComplete } });
+      window.__TAURI__.event.emit("theme-changed", {
+        theme: isDark ? "dark" : "light",
+        uiTheme
+      });
+    }
+  });
+
+  // Finish
+  document.getElementById("ob-finish").addEventListener("click", finishOnboarding);
+}
+
+function goToOnboardingStep(step) {
+  // Update step content
+  document.querySelectorAll(".onboarding-step").forEach(s => {
+    s.classList.toggle("active", parseInt(s.dataset.step, 10) === step);
+  });
+  // Update dots
+  document.querySelectorAll(".onboarding-dot").forEach(d => {
+    const dotStep = parseInt(d.dataset.step, 10);
+    d.classList.toggle("active", dotStep === step);
+    d.classList.toggle("done", dotStep < step);
+  });
+}
+
+async function finishOnboarding() {
+  _onboardingComplete = true;
+  const isDark = document.body.classList.contains("dark-mode");
+  const uiTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+
+  // Persist with onboarding flag
+  if (IS_TAURI) {
+    await tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme, onboardingComplete: true } });
+  }
+
+  // Also sync the settings page theme cards
+  document.querySelectorAll(".theme-card").forEach(c => {
+    c.classList.toggle("active", c.dataset.theme === uiTheme);
+  });
+
+  // Animate out
+  const overlay = document.getElementById("onboarding-overlay");
+  overlay.classList.add("fade-out");
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("fade-out");
+  }, 300);
 }
 
 // ============================================

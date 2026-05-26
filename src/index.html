@@ -153,6 +153,21 @@
     </div>
   </div>
 
+  <!-- ==================== GROUP TABS ==================== -->
+  <div class="tab-bar" id="tab-bar">
+    <div class="tab-scroll" id="tab-scroll">
+      <button type="button" class="tab active" data-tab="all">All</button>
+      <button type="button" class="tab tab-fav" data-tab="favorites">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Favorites
+      </button>
+      <!-- dynamic group tabs inserted here -->
+    </div>
+    <button type="button" class="tab tab-add" id="tab-add-group" title="New group">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
   <!-- ==================== MAIN LIST ==================== -->
   <div id="page-main" class="page">
     <div class="contact-grid" id="contact-list"></div>
@@ -255,6 +270,125 @@
         <button type="button" class="btn btn-ghost" id="btn-confirm-cancel">Cancel</button>
         <button type="button" class="btn btn-danger" id="btn-confirm-ok">Delete</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== ONBOARDING ==================== -->
+  <div id="onboarding-overlay" class="onboarding-overlay hidden">
+    <div class="onboarding-card">
+
+      <!-- Step indicators -->
+      <div class="onboarding-steps">
+        <div class="onboarding-dot active" data-step="0"></div>
+        <div class="onboarding-dot" data-step="1"></div>
+        <div class="onboarding-dot" data-step="2"></div>
+      </div>
+
+      <!-- Step 0: Welcome -->
+      <div class="onboarding-step active" data-step="0">
+        <div class="onboarding-icon">
+          <span style="font-size:40px">📒</span>
+        </div>
+        <h2 class="onboarding-title">Welcome to KaiBook</h2>
+        <p class="onboarding-desc">Your system tray contact book for freelancers. Keep track of clients across timezones, right from your menu bar.</p>
+        <p class="onboarding-desc" style="opacity:0.7;font-size:12px">Let's get you set up in 3 quick steps.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="btn btn-primary onboarding-next" id="ob-start">Get Started</button>
+        </div>
+      </div>
+
+      <!-- Step 1: Pick a theme -->
+      <div class="onboarding-step" data-step="1">
+        <h2 class="onboarding-title">Pick your style</h2>
+        <p class="onboarding-desc">Choose a theme — you can always change it later in Settings.</p>
+        <div class="onboarding-theme-grid" id="ob-theme-grid">
+          <button type="button" class="ob-theme-card active" data-theme="skeuomorphic">
+            <div class="ob-theme-preview ob-preview-skeuomorphic">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Skeuomorphic</span>
+          </button>
+          <button type="button" class="ob-theme-card" data-theme="nordic">
+            <div class="ob-theme-preview ob-preview-nordic">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Nordic</span>
+          </button>
+          <button type="button" class="ob-theme-card" data-theme="rosepine">
+            <div class="ob-theme-preview ob-preview-rosepine">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Ros&eacute; Pine</span>
+          </button>
+          <button type="button" class="ob-theme-card" data-theme="cyberpunk">
+            <div class="ob-theme-preview ob-preview-cyberpunk">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Cyberpunk</span>
+          </button>
+          <button type="button" class="ob-theme-card" data-theme="paper">
+            <div class="ob-theme-preview ob-preview-paper">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Paper</span>
+          </button>
+          <button type="button" class="ob-theme-card" data-theme="monokai">
+            <div class="ob-theme-preview ob-preview-monokai">
+              <div class="ob-preview-bar"></div>
+              <div class="ob-preview-cards">
+                <div class="ob-preview-card"></div>
+                <div class="ob-preview-card"></div>
+              </div>
+            </div>
+            <span class="ob-theme-name">Monokai</span>
+          </button>
+        </div>
+        <div class="onboarding-row">
+          <label class="ob-dark-toggle">
+            <input type="checkbox" id="ob-dark-check">
+            <span>Dark mode</span>
+          </label>
+        </div>
+        <div class="onboarding-actions">
+          <button type="button" class="btn btn-ghost onboarding-back" data-back="0">Back</button>
+          <button type="button" class="btn btn-primary onboarding-next" id="ob-theme-next">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Keyboard shortcut -->
+      <div class="onboarding-step" data-step="2">
+        <h2 class="onboarding-title">Your secret shortcut</h2>
+        <p class="onboarding-desc">Access your contacts instantly from anywhere on your Mac — no clicking required.</p>
+        <div class="onboarding-shortcut">
+          <kbd>Ctrl</kbd><span class="hotkey-plus">+</span><kbd>Shift</kbd><span class="hotkey-plus">+</span><kbd>K</kbd>
+        </div>
+        <p class="onboarding-desc" style="opacity:0.7;font-size:12px;margin-top:12px">Opens the tray popup with your contacts. Press again to dismiss.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="btn btn-ghost onboarding-back" data-back="1">Back</button>
+          <button type="button" class="btn btn-primary" id="ob-finish">Start Using KaiBook</button>
+        </div>
+      </div>
+
     </div>
   </div>
 

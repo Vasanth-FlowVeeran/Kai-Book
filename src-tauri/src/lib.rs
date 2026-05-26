@@ -6,14 +6,19 @@ use std::time::Instant;
 use tauri::async_runtime::JoinHandle;
 use tauri::{
     menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     Emitter, Manager, PhysicalPosition, Theme,
 };
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 #[derive(Default)]
 pub struct TrayState {
     click_task: Mutex<Option<JoinHandle<()>>>,
     last_double_click: Mutex<Option<Instant>>,
+}
+
+pub struct TrayIconState {
+    icon: Mutex<Option<TrayIcon>>,
 }
 
 // ============================================
@@ -34,6 +39,20 @@ pub struct Contact {
     pub notes: String,
     pub created_at: String,
     pub updated_at: String,
+    #[serde(default)]
+    pub favorite: bool,
+    #[serde(default)]
+    pub groups: Vec<String>,
+}
+
+/// A user-created contact group.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ContactGroup {
+    pub id: String,
+    pub name: String,
+    #[serde(default)]
+    pub color: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -44,6 +63,16 @@ pub struct ContactsFile {
 // ============================================
 // Helpers
 // ============================================
+
+/// Returns ~/.kaibook/groups.json
+fn groups_path() -> Result<PathBuf, String> {
+    let home = dirs::home_dir().ok_or("Could not determine home directory")?;
+    let dir = home.join(".kaibook");
+    if !dir.exists() {
+        fs::create_dir_all(&dir).map_err(|e| format!("Failed to create .kaibook dir: {e}"))?;
+    }
+    Ok(dir.join("groups.json"))
+}
 
 /// Returns ~/.kaibook/contacts.json, creating the directory if needed.
 fn contacts_path() -> Result<PathBuf, String> {
@@ -65,6 +94,8 @@ fn contacts_path() -> Result<PathBuf, String> {
 pub struct ThemeSettings {
     pub dark_mode: bool,
     pub ui_theme: String,
+    #[serde(default)]
+    pub onboarding_complete: bool,
 }
 
 /// Returns ~/.kaibook/theme.json
@@ -84,6 +115,7 @@ fn load_theme() -> Result<ThemeSettings, String> {
         return Ok(ThemeSettings {
             dark_mode: false,
             ui_theme: "skeuomorphic".to_string(),
+            onboarding_complete: false,
         });
     }
     let data = fs::read_to_string(&path).map_err(|e| format!("Read error: {e}"))?;
@@ -175,6 +207,101 @@ fn exit_app(app: tauri::AppHandle) {
     app.exit(0);
 }
 
+/// Load contact groups from ~/.kaibook/groups.json.
+#[tauri::command]
+fn load_groups() -> Result<Vec<ContactGroup>, String> {
+    let path = groups_path()?;
+    if !path.exists() {
+        return Ok(vec![]);
+    }
+    let data = fs::read_to_string(&path).map_err(|e| format!("Read error: {e}"))?;
+    serde_json::from_str(&data).map_err(|e| format!("Parse error: {e}"))
+}
+
+/// Save contact groups to ~/.kaibook/groups.json.
+#[tauri::command]
+fn save_groups(groups: Vec<ContactGroup>) -> Result<(), String> {
+    let path = groups_path()?;
+    let json =
+        serde_json::to_string_pretty(&groups).map_err(|e| format!("Serialize error: {e}"))?;
+    fs::write(&path, json).map_err(|e| format!("Write error: {e}"))?;
+    Ok(())
+}
+
+/// Open a URL (mailto:, https:, etc.) with the system default handler.
+#[tauri::command]
+fn open_url(url: String) -> Result<(), String> {
+    tauri_plugin_opener::open_url(url, None::<&str>)
+        .map_err(|e| format!("Failed to open URL: {e}"))
+}
+
+// ============================================
+// Shared popup positioning helper
+// ============================================
+
+fn position_popup_near_tray(app: &tauri::AppHandle, tray: &TrayIcon) {
+    if let Some(popup) = app.get_webview_window("tray-popup") {
+        if let Ok(Some(rect)) = tray.rect() {
+            let (monitor_x, monitor_y, monitor_w, monitor_h) =
+                if let Ok(Some(monitor)) = app.primary_monitor() {
+                    let pos = monitor.position();
+                    let size = monitor.size();
+                    (
+                        pos.x as f64,
+                        pos.y as f64,
+                        size.width as f64,
+                        size.height as f64,
+                    )
+                } else {
+                    (0.0, 0.0, 1920.0, 1080.0)
+                };
+
+            let (px, py) = match rect.position {
+                tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
+                tauri::Position::Logical(l) => (l.x, l.y),
+            };
+            let (sw, sh) = match rect.size {
+                tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
+                tauri::Size::Logical(l) => (l.width, l.height),
+            };
+
+            let popup_width = 320.0;
+            let popup_height = 440.0;
+            let tray_center_x = px + (sw / 2.0);
+            let tray_center_y = py + (sh / 2.0);
+
+            let dist_bottom = (monitor_y + monitor_h) - tray_center_y;
+            let dist_top = tray_center_y - monitor_y;
+            let dist_right = (monitor_x + monitor_w) - tray_center_x;
+            let dist_left = tray_center_x - monitor_x;
+
+            let mut x = tray_center_x - (popup_width / 2.0);
+            let mut y = py + sh;
+
+            let min_dist = dist_bottom.min(dist_top).min(dist_right).min(dist_left);
+
+            if min_dist == dist_bottom {
+                x = tray_center_x - (popup_width / 2.0);
+                y = py - popup_height;
+            } else if min_dist == dist_top {
+                x = tray_center_x - (popup_width / 2.0);
+                y = py + sh;
+            } else if min_dist == dist_right {
+                x = px - popup_width;
+                y = tray_center_y - (popup_height / 2.0);
+            } else if min_dist == dist_left {
+                x = px + sw;
+                y = tray_center_y - (popup_height / 2.0);
+            }
+
+            x = x.max(monitor_x).min(monitor_x + monitor_w - popup_width);
+            y = y.max(monitor_y).min(monitor_y + monitor_h - popup_height);
+
+            let _ = popup.set_position(PhysicalPosition::new(x as i32, y as i32));
+        }
+    }
+}
+
 // ============================================
 // App setup
 // ============================================
@@ -183,7 +310,39 @@ fn exit_app(app: tauri::AppHandle) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        let ctrl_shift_k = Shortcut::new(
+                            Some(Modifiers::CONTROL | Modifiers::SHIFT),
+                            Code::KeyK,
+                        );
+                        if shortcut == &ctrl_shift_k {
+                            if let Some(popup) = app.get_webview_window("tray-popup") {
+                                if popup.is_visible().unwrap_or(false) {
+                                    let _ = popup.hide();
+                                } else {
+                                    // Position relative to the tray icon (same as click)
+                                    let tray_state = app.state::<TrayIconState>();
+                                    if let Some(tray) = tray_state.icon.lock().unwrap().as_ref() {
+                                        position_popup_near_tray(app, tray);
+                                    }
+                                    let _ = popup.show();
+                                    let _ = popup.set_focus();
+                                    let _ = app.emit_to("tray-popup", "refresh-contacts", ());
+                                }
+                            }
+                        }
+                    }
+                })
+                .build(),
+        )
         .manage(TrayState::default())
+        .manage(TrayIconState {
+            icon: Mutex::new(None),
+        })
         .setup(|app| {
             // ---- Right-click context menu for tray ----
             let show_item = MenuItem::with_id(app, "show", "Open KaiBook", true, None::<&str>)?;
@@ -211,8 +370,14 @@ pub fn run() {
                 });
             }
 
+            // ---- Register global shortcut Ctrl+Shift+K ----
+            app.global_shortcut().register(Shortcut::new(
+                Some(Modifiers::CONTROL | Modifiers::SHIFT),
+                Code::KeyK,
+            ))?;
+
             // ---- Build tray icon ----
-            TrayIconBuilder::new()
+            let tray_icon = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .tooltip("KaiBook")
                 .menu(&menu)
@@ -264,76 +429,7 @@ pub fn run() {
                                     if popup.is_visible().unwrap_or(false) {
                                         let _ = popup.hide();
                                     } else {
-                                        // Position popup dynamically based on taskbar/tray icon position
-                                        if let Ok(Some(rect)) = tray_clone.rect() {
-                                            // Get monitor dimensions (usually primary monitor contains the taskbar/tray)
-                                            let (monitor_x, monitor_y, monitor_w, monitor_h) = if let Ok(Some(monitor)) = app_clone.primary_monitor() {
-                                                let pos = monitor.position();
-                                                let size = monitor.size();
-                                                (pos.x as f64, pos.y as f64, size.width as f64, size.height as f64)
-                                            } else {
-                                                (0.0, 0.0, 1920.0, 1080.0)
-                                            };
-
-                                            let (px, py) = match rect.position {
-                                                tauri::Position::Physical(p) => {
-                                                    (p.x as f64, p.y as f64)
-                                                }
-                                                tauri::Position::Logical(l) => (l.x, l.y),
-                                            };
-                                            let (sw, sh) = match rect.size {
-                                                tauri::Size::Physical(p) => {
-                                                    (p.width as f64, p.height as f64)
-                                                }
-                                                tauri::Size::Logical(l) => (l.width, l.height),
-                                            };
-
-                                            let popup_width = 320.0;
-                                            let popup_height = 440.0;
-
-                                            let tray_center_x = px + (sw / 2.0);
-                                            let tray_center_y = py + (sh / 2.0);
-
-                                            // Determine which screen boundary the tray icon is closest to
-                                            let dist_bottom = (monitor_y + monitor_h) - tray_center_y;
-                                            let dist_top = tray_center_y - monitor_y;
-                                            let dist_right = (monitor_x + monitor_w) - tray_center_x;
-                                            let dist_left = tray_center_x - monitor_x;
-
-                                            let mut x = tray_center_x - (popup_width / 2.0);
-                                            let mut y = py + sh; // Default fallback to top/below
-
-                                            let min_dist = dist_bottom
-                                                .min(dist_top)
-                                                .min(dist_right)
-                                                .min(dist_left);
-
-                                            if min_dist == dist_bottom {
-                                                // Taskbar is at the bottom: place popup above tray icon
-                                                x = tray_center_x - (popup_width / 2.0);
-                                                y = py - popup_height;
-                                            } else if min_dist == dist_top {
-                                                // Taskbar is at the top: place popup below tray icon
-                                                x = tray_center_x - (popup_width / 2.0);
-                                                y = py + sh;
-                                            } else if min_dist == dist_right {
-                                                // Taskbar is on the right: place popup to the left of tray icon
-                                                x = px - popup_width;
-                                                y = tray_center_y - (popup_height / 2.0);
-                                            } else if min_dist == dist_left {
-                                                // Taskbar is on the left: place popup to the right of tray icon
-                                                x = px + sw;
-                                                y = tray_center_y - (popup_height / 2.0);
-                                            }
-
-                                            // Constraint to ensure the window fits completely inside the monitor bounds
-                                            x = x.max(monitor_x).min(monitor_x + monitor_w - popup_width);
-                                            y = y.max(monitor_y).min(monitor_y + monitor_h - popup_height);
-
-                                            let _ = popup.set_position(PhysicalPosition::new(
-                                                x as i32, y as i32,
-                                            ));
-                                        }
+                                        position_popup_near_tray(&app_clone, &tray_clone);
                                         let _ = popup.show();
                                         let _ = popup.set_focus();
                                         let _ = app_clone.emit_to("tray-popup", "refresh-contacts", ());
@@ -373,6 +469,9 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            // Store tray icon so the global shortcut handler can position relative to it
+            *app.state::<TrayIconState>().icon.lock().unwrap() = Some(tray_icon);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -380,11 +479,14 @@ pub fn run() {
             save_contacts,
             export_contacts_to,
             import_contacts_from,
+            load_groups,
+            save_groups,
             show_main_window,
             exit_app,
             load_theme,
             save_theme,
             set_native_theme,
+            open_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running KaiBook");

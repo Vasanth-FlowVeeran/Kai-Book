@@ -3,6 +3,8 @@
 // ============================================
 
 let contacts = [];
+var groups = [];
+var trayActiveTab = "all";
 var trayPage = 0;
 var TRAY_PAGE_SIZE = 10;
 var TRAY_MAX_PAGES = 2;
@@ -57,16 +59,65 @@ var COMMON_TZ = [
 // ============================================
 // Init
 // ============================================
+async function loadTrayGroups() {
+  try { groups = await invoke("load_groups"); }
+  catch (e) { console.warn("load_groups failed:", e); groups = []; }
+}
+
+function renderTrayTabs() {
+  var container = document.getElementById("tray-tabs");
+  // Remove old dynamic tabs
+  container.querySelectorAll(".tray-tab-group").forEach(function (t) { t.remove(); });
+
+  // Add group tabs
+  groups.forEach(function (g) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tray-tab tray-tab-group" + (trayActiveTab === g.id ? " active" : "");
+    btn.dataset.tab = g.id;
+    btn.innerHTML = '<span class="tray-tab-dot" style="background:' + esc(g.color) + '"></span>' + esc(g.name);
+    btn.addEventListener("click", function () {
+      trayActiveTab = g.id;
+      trayPage = 0;
+      updateTrayTabActive();
+      renderContacts();
+    });
+    container.appendChild(btn);
+  });
+
+  updateTrayTabActive();
+}
+
+function updateTrayTabActive() {
+  document.querySelectorAll(".tray-tab").forEach(function (t) {
+    t.classList.toggle("active", t.dataset.tab === trayActiveTab);
+  });
+}
+
+function filterTrayContacts(list) {
+  if (trayActiveTab === "all") return list;
+  if (trayActiveTab === "favorites") return list.filter(function (c) { return c.favorite; });
+  return list.filter(function (c) { return c.groups && c.groups.indexOf(trayActiveTab) !== -1; });
+}
+
 async function init() {
   await initTheme();
   await loadContacts();
+  await loadTrayGroups();
   populateTZ();
   bindEvents();
+  renderTrayTabs();
   renderContacts();
   startClock();
 
   window.__TAURI__.event.listen("refresh-contacts", async function () {
     await loadContacts();
+    renderContacts();
+  });
+
+  window.__TAURI__.event.listen("groups-changed", async function () {
+    await loadTrayGroups();
+    renderTrayTabs();
     renderContacts();
   });
 
@@ -116,13 +167,15 @@ function renderContacts() {
   var list = document.getElementById("tray-contact-list");
   var q = (document.getElementById("tray-search-input").value || "").toLowerCase();
 
+  // Apply tab filter first, then search
+  var tabFiltered = filterTrayContacts(contacts);
   var filtered = q
-    ? contacts.filter(function (c) {
+    ? tabFiltered.filter(function (c) {
         return c.name.toLowerCase().includes(q) ||
           (c.emailPrimary && c.emailPrimary.toLowerCase().includes(q)) ||
           (c.phonePrimary && c.phonePrimary.toLowerCase().includes(q));
       })
-    : contacts;
+    : tabFiltered;
 
   // Cap to max contacts (TRAY_MAX_PAGES * TRAY_PAGE_SIZE)
   var maxContacts = TRAY_MAX_PAGES * TRAY_PAGE_SIZE;
@@ -145,10 +198,15 @@ function renderContacts() {
     return;
   }
 
-  var rows = pageItems.map(function (c) {
+  var rows = pageItems.map(function (c, idx) {
     var sub = c.emailPrimary || c.phonePrimary || "";
+    var mailBtn = c.emailPrimary
+      ? '<button type="button" class="tray-mail-btn" data-email="' + esc(c.emailPrimary) + '" data-name="' + esc(c.name) + '" title="Compose email">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>' +
+        '</button>'
+      : '';
     return (
-      '<div class="contact-row" data-id="' + c.id + '">' +
+      '<div class="contact-row" data-id="' + c.id + '" style="animation-delay:' + (idx * 25) + 'ms">' +
         '<div class="avatar-wrap">' +
           '<div class="avatar" style="background:' + avatarGradient(c.name) + '">' + initial(c.name) + '</div>' +
           todBadge(c.timezone) +
@@ -157,6 +215,7 @@ function renderContacts() {
           '<div class="contact-name">' + esc(c.name) + '</div>' +
           (sub ? '<div class="contact-detail">' + esc(sub) + '</div>' : '') +
         '</div>' +
+        mailBtn +
         '<div class="time-badge" data-timezone="' + esc(c.timezone) + '">' + fmtTime(c.timezone) + '</div>' +
       '</div>'
     );
@@ -177,6 +236,18 @@ function renderContacts() {
   }
 
   list.innerHTML = rows + paginationHtml;
+
+  // Bind mail buttons (before row clicks so stopPropagation works)
+  list.querySelectorAll(".tray-mail-btn").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var email = btn.dataset.email;
+      var name = btn.dataset.name;
+      var subject = encodeURIComponent("Hi " + name);
+      var url = "mailto:" + email + "?subject=" + subject;
+      invoke("open_url", { url: url });
+    });
+  });
 
   // Bind contact row clicks
   list.querySelectorAll(".contact-row").forEach(function (row) {
@@ -350,7 +421,12 @@ function todBadge(tz) {
 // Quick Add
 // ============================================
 function showQA() {
-  document.getElementById("quick-add-form").classList.remove("hidden");
+  var form = document.getElementById("quick-add-form");
+  form.classList.remove("hidden");
+  // Re-trigger slide animation
+  form.style.animation = "none";
+  void form.offsetHeight;
+  form.style.animation = "";
   document.getElementById("tray-actions").classList.add("hidden");
   document.body.classList.add("qa-open");
   document.getElementById("qa-name").focus();
@@ -402,6 +478,20 @@ async function saveQA() {
 function bindEvents() {
   document.getElementById("tray-search-input").addEventListener("input", function () {
     trayPage = 0;
+    renderContacts();
+  });
+
+  // Tab clicks — All and Favorites
+  document.querySelector('.tray-tab[data-tab="all"]').addEventListener("click", function () {
+    trayActiveTab = "all";
+    trayPage = 0;
+    updateTrayTabActive();
+    renderContacts();
+  });
+  document.querySelector('.tray-tab[data-tab="favorites"]').addEventListener("click", function () {
+    trayActiveTab = "favorites";
+    trayPage = 0;
+    updateTrayTabActive();
     renderContacts();
   });
   document.getElementById("tray-quick-add").addEventListener("click", showQA);

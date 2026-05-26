@@ -296,6 +296,14 @@ body[data-theme="cyberpunk"] .tray-action--danger:hover {
   background: rgba(255,0,60,0.06);
   color: #ff003c;
 }
+body[data-theme="cyberpunk"] .tray-mail-btn {
+  border-radius: 0;
+}
+body[data-theme="cyberpunk"] .tray-mail-btn:hover {
+  background: rgba(0,240,255,0.08);
+  border-color: rgba(0,240,255,0.25);
+  color: #00f0ff;
+}
 body[data-theme="cyberpunk"] .tray-pagination { border-top: 1px solid rgba(0,240,255,0.06); }
 body[data-theme="cyberpunk"] .tray-page-btn {
   border-radius: 0;
@@ -445,6 +453,11 @@ body[data-theme="cyberpunk"]:not(.dark-mode) .tray-action:hover {
 body[data-theme="cyberpunk"]:not(.dark-mode) .tray-action--danger:hover {
   background: rgba(204,34,68,0.1);
   color: #e04060;
+}
+body[data-theme="cyberpunk"]:not(.dark-mode) .tray-mail-btn:hover {
+  background: rgba(200,150,60,0.08);
+  border-color: rgba(200,150,60,0.25);
+  color: #9a7228;
 }
 body[data-theme="cyberpunk"]:not(.dark-mode) .tray-pagination {
   border-top-color: #c4c0ba;

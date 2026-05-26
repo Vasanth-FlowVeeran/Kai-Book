@@ -106,7 +106,7 @@ body {
   flex: 1;
   background: none;
   border: none;
-  color: var(--paper);
+  color: rgba(255,240,220,0.9);
   font-size: 13px;
   font-family: var(--font-ui);
   outline: none;
@@ -115,6 +115,88 @@ body {
 
 .tray-search input::placeholder {
   color: rgba(255,240,220,0.3);
+}
+
+/* Dark-mode: always use --ink which themes set to a readable light color */
+body.dark-mode .tray-search input {
+  color: var(--ink, #d8dee9);
+}
+body.dark-mode .tray-search input::placeholder {
+  color: var(--ink-muted, #7b8a9e);
+}
+
+/* ============================================
+   Group Tabs — compact pills
+   ============================================ */
+.tray-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-bottom: 1px solid var(--leather-edge);
+}
+.tray-tabs::-webkit-scrollbar { display: none; }
+
+.tray-tab {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255,240,220,0.4);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+.tray-tab:hover {
+  background: rgba(255,240,220,0.06);
+  color: rgba(255,240,220,0.7);
+}
+.tray-tab.active {
+  background: rgba(197,149,58,0.15);
+  color: var(--gold-light);
+}
+
+.tray-tab-fav svg {
+  width: 10px;
+  height: 10px;
+  color: var(--gold);
+}
+
+.tray-tab .tray-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Light mode tray tabs */
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-tabs {
+  border-bottom-color: var(--paper-shadow);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-tab {
+  color: var(--ink-muted);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-tab:hover {
+  background: rgba(0,0,0,0.04);
+  color: var(--ink);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-tab.active {
+  background: rgba(197,149,58,0.12);
+  color: var(--gold-dark);
+}
+
+/* Dark mode tray tabs */
+body.dark-mode .tray-tabs {
+  border-bottom-color: rgba(255,240,220,0.04);
 }
 
 /* ============================================
@@ -267,6 +349,38 @@ body.qa-open .tray-list {
   text-overflow: ellipsis;
   line-height: 1.3;
   margin-top: 1px;
+}
+
+/* Tray mail button — visible on hover */
+.tray-mail-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: all var(--transition);
+}
+.contact-row:hover .tray-mail-btn {
+  opacity: 1;
+}
+.tray-mail-btn:hover {
+  background: rgba(197, 149, 58, 0.1);
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+
+/* Dark mode mail button */
+body.dark-mode .tray-mail-btn:hover {
+  background: rgba(197, 149, 58, 0.1);
+  color: var(--gold-light);
+  border-color: var(--gold);
 }
 
 /* Time badge */
@@ -704,4 +818,90 @@ body.dark-mode .qa-btn-cancel:hover {
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+/* Keyframes */
+@keyframes tray-row-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tray-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tray-pulse-success {
+  0%   { box-shadow: 0 0 0 0 rgba(106,191,122,0.35); }
+  70%  { box-shadow: 0 0 0 6px rgba(106,191,122,0); }
+  100% { box-shadow: 0 0 0 0 rgba(106,191,122,0); }
+}
+
+@keyframes tray-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Contact row entrance — stagger via inline style animation-delay */
+.contact-row {
+  animation: tray-row-in 0.18s ease both;
+  will-change: transform, opacity;
+}
+
+/* Copied feedback pulse */
+.contact-row.copied {
+  animation: tray-pulse-success 0.5s ease;
+}
+
+/* Search focus glow */
+.tray-search input:focus {
+  box-shadow: 0 0 0 2px rgba(197,149,58,0.18);
+  transition: box-shadow 0.15s ease;
+}
+
+/* Quick-add form slide in */
+.qa {
+  animation: tray-slide-up 0.2s ease both;
+}
+
+/* Footer button press feedback */
+.tray-action:active {
+  transform: scale(0.94);
+  transition-duration: 60ms;
+}
+
+/* Quick-add button press */
+.qa-btn:active {
+  transform: scale(0.95);
+  transition-duration: 60ms;
+}
+
+/* Pagination button press */
+.tray-page-btn:active:not(.disabled) {
+  transform: scale(0.9);
+  transition-duration: 60ms;
+}
+
+/* Tray container entrance */
+.tray {
+  animation: tray-fade-in 0.15s ease;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .contact-row,
+  .contact-row.copied,
+  .qa,
+  .tray {
+    animation: none !important;
+  }
+  .tray-action:active,
+  .qa-btn:active,
+  .tray-page-btn:active:not(.disabled) {
+    transform: none !important;
+  }
 }
