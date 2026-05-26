@@ -30,6 +30,7 @@
         { "path": "$HOME/.kaibook/**" }
       ]
     },
-    "fs:default"
+    "fs:default",
+    "core:window:allow-set-theme"
   ]
 }

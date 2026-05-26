@@ -136,6 +136,15 @@ let confirmCallback = null;
 // ============================================
 // THEME (dark mode + UI themes)
 // ============================================
+function syncNativeTheme() {
+  if (!IS_TAURI) return;
+  const isDark = document.body.classList.contains("dark-mode");
+  const uiTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+  // Paper in light mode is the only light-toolbar theme; everything else is dark
+  const wantDark = !(uiTheme === "paper" && !isDark);
+  tauriInvoke("set_native_theme", { dark: wantDark });
+}
+
 async function initTheme() {
   let darkMode = false;
   let uiTheme = "skeuomorphic";
@@ -153,6 +162,7 @@ async function initTheme() {
     document.body.classList.add("dark-mode");
   }
   document.body.setAttribute("data-theme", uiTheme);
+  syncNativeTheme();
   // Highlight correct card in settings
   setTimeout(() => {
     document.querySelectorAll(".theme-card").forEach(c => {
@@ -164,6 +174,7 @@ async function initTheme() {
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark-mode");
   const uiTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+  syncNativeTheme();
   // Persist to shared file
   if (IS_TAURI) {
     tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: uiTheme } });
@@ -181,6 +192,7 @@ function setUITheme(themeName) {
   document.querySelectorAll(".theme-card").forEach(c => {
     c.classList.toggle("active", c.dataset.theme === themeName);
   });
+  syncNativeTheme();
   // Persist to shared file
   if (IS_TAURI) {
     tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: themeName } });

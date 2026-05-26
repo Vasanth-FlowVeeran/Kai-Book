@@ -7,7 +7,7 @@ use tauri::async_runtime::JoinHandle;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Emitter, Manager, PhysicalPosition,
+    Emitter, Manager, PhysicalPosition, Theme,
 };
 
 #[derive(Default)]
@@ -151,6 +151,15 @@ fn show_main_window(app: tauri::AppHandle) {
     // Hide the tray popup if open
     if let Some(popup) = app.get_webview_window("tray-popup") {
         let _ = popup.hide();
+    }
+}
+
+/// Set the native window theme (title bar appearance).
+#[tauri::command]
+fn set_native_theme(app: tauri::AppHandle, dark: bool) {
+    let theme = if dark { Some(Theme::Dark) } else { Some(Theme::Light) };
+    if let Some(win) = app.get_webview_window("main") {
+        let _ = win.set_theme(theme);
     }
 }
 
@@ -369,6 +378,7 @@ pub fn run() {
             exit_app,
             load_theme,
             save_theme,
+            set_native_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running KaiBook");

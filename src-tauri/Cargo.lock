@@ -1613,6 +1613,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-fs",
+ "tokio",
 ]
 
 [[package]]

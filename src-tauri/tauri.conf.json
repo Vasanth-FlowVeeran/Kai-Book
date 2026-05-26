@@ -23,7 +23,8 @@
         "center": true,
         "visible": false,
         "decorations": true,
-        "resizable": true
+        "resizable": true,
+        "theme": "Dark"
       },
       {
         "label": "tray-popup",
@@ -39,11 +40,6 @@
         "alwaysOnTop": true
       }
     ],
-    "trayIcon": {
-      "iconPath": "icons/tray-icon.png",
-      "iconAsTemplate": true,
-      "tooltip": "KaiBook — Contact Manager"
-    },
     "security": {
       "csp": null
     }

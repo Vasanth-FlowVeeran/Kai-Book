@@ -1191,8 +1191,8 @@ body.dark-mode .theme-toggle .icon-sun  { display: inline; }
 
 /* ---- Dark mode: theme grid ---- */
 body.dark-mode .theme-card {
-  background: linear-gradient(135deg, #302a24, #28231e);
-  border-color: rgba(255,240,220,0.06);
+  background: linear-gradient(135deg, var(--parchment), var(--paper));
+  border-color: var(--paper-shadow);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1213,7 +1213,7 @@ body.dark-mode .theme-card:hover:not([disabled]) {
 
 body.dark-mode .theme-card.active {
   border-color: var(--gold);
-  background: linear-gradient(135deg, #3a3428, #302a22);
+  background: linear-gradient(135deg, var(--cream), var(--parchment));
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.06),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1289,8 +1289,8 @@ body.dark-mode .card-time {
 
 /* Dark mode — card actions */
 body.dark-mode .card-action {
-  background: linear-gradient(135deg, #3a3428, #302a22);
-  border-color: rgba(255,240,220,0.06);
+  background: linear-gradient(135deg, var(--cream), var(--parchment));
+  border-color: var(--paper-shadow);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1299,8 +1299,8 @@ body.dark-mode .card-action {
     0 8px 16px rgba(0,0,0,0.08);
 }
 body.dark-mode .card-action:hover {
-  background: linear-gradient(135deg, #444038, #3a3428);
-  border-color: rgba(255,240,220,0.1);
+  background: linear-gradient(135deg, var(--parchment), var(--cream));
+  border-color: var(--ink-faint);
   color: var(--ink);
   transform: translateY(-1px);
   box-shadow:
@@ -1311,9 +1311,9 @@ body.dark-mode .card-action:hover {
     0 12px 24px rgba(0,0,0,0.1);
 }
 body.dark-mode .card-action.delete:hover {
-  background: linear-gradient(135deg, #4a2828, #3a2020);
-  border-color: #6a3838;
-  color: #d08080;
+  background: linear-gradient(135deg, var(--red-leather), var(--red-leather-light));
+  border-color: var(--red-leather);
+  color: #f0a0a0;
 }
 
 /* Dark mode — add button */
@@ -1328,9 +1328,9 @@ body.dark-mode .add-btn:hover {
 
 /* Dark mode — ghost button */
 body.dark-mode .btn-ghost {
-  background: linear-gradient(135deg, #3a3428, #302a22);
+  background: linear-gradient(135deg, var(--cream), var(--parchment));
   color: var(--ink-muted);
-  border-color: rgba(255,240,220,0.06);
+  border-color: var(--paper-shadow);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1340,8 +1340,8 @@ body.dark-mode .btn-ghost {
   text-shadow: none;
 }
 body.dark-mode .btn-ghost:hover {
-  background: linear-gradient(135deg, #444038, #3a3428);
-  border-color: rgba(255,240,220,0.1);
+  background: linear-gradient(135deg, var(--parchment), var(--cream));
+  border-color: var(--ink-faint);
   color: var(--ink);
   transform: translateY(-1px);
   box-shadow:
@@ -1376,7 +1376,7 @@ body.dark-mode .form-group textarea:focus {
     0 0 0 2px rgba(197,149,58,0.12);
 }
 body.dark-mode .form-group select option {
-  background: #28231e;
+  background: var(--paper);
   color: var(--ink);
 }
 body.dark-mode .form-group select {
@@ -1448,8 +1448,8 @@ body.dark-mode .setting-card {
 
 /* Dark mode — hotkey keys */
 body.dark-mode .hotkey-row kbd {
-  background: linear-gradient(135deg, #3a3428, #302a22);
-  border-color: rgba(255,240,220,0.06);
+  background: linear-gradient(135deg, var(--cream), var(--parchment));
+  border-color: var(--paper-shadow);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1460,8 +1460,8 @@ body.dark-mode .hotkey-row kbd {
 
 /* Dark mode — back button */
 body.dark-mode .back-btn {
-  background: linear-gradient(135deg, #3a3428, #302a22);
-  border-color: rgba(255,240,220,0.06);
+  background: linear-gradient(135deg, var(--cream), var(--parchment));
+  border-color: var(--paper-shadow);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
     inset 0 -1px 0 rgba(0,0,0,0.2),
@@ -1470,7 +1470,7 @@ body.dark-mode .back-btn {
     0 8px 16px rgba(0,0,0,0.06);
 }
 body.dark-mode .back-btn:hover {
-  background: linear-gradient(135deg, #444038, #3a3428);
+  background: linear-gradient(135deg, var(--parchment), var(--cream));
   transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.06),
