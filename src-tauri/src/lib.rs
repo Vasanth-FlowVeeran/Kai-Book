@@ -1,11 +1,20 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Mutex;
+use std::time::Instant;
+use tauri::async_runtime::JoinHandle;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Emitter, Manager, PhysicalPosition,
 };
+
+#[derive(Default)]
+pub struct TrayState {
+    click_task: Mutex<Option<JoinHandle<()>>>,
+    last_double_click: Mutex<Option<Instant>>,
+}
 
 // ============================================
 // Data types
@@ -159,6 +168,7 @@ fn exit_app(app: tauri::AppHandle) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
+        .manage(TrayState::default())
         .setup(|app| {
             // ---- Right-click context menu for tray ----
             let show_item = MenuItem::with_id(app, "show", "Open KaiBook", true, None::<&str>)?;
@@ -171,6 +181,16 @@ pub fn run() {
                 main_window.on_window_event(move |event| {
                     if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                         api.prevent_close();
+                        let _ = w.hide();
+                    }
+                });
+            }
+
+            // ---- Auto-hide tray popup when it loses focus ----
+            if let Some(popup_window) = app.get_webview_window("tray-popup") {
+                let w = popup_window.clone();
+                popup_window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::Focused(false) = event {
                         let _ = w.hide();
                     }
                 });
@@ -198,48 +218,132 @@ pub fn run() {
                     let app = tray.app_handle();
 
                     match event {
-                        // ---- Single click → toggle tray popup ----
+                        // ---- Single click → toggle tray popup with debounce ----
                         TrayIconEvent::Click {
                             button: MouseButton::Left,
                             button_state: MouseButtonState::Up,
                             ..
                         } => {
-                            if let Some(popup) = app.get_webview_window("tray-popup") {
-                                if popup.is_visible().unwrap_or(false) {
-                                    let _ = popup.hide();
-                                } else {
-                                    // Position popup below tray icon
-                                    if let Ok(Some(rect)) = tray.rect() {
-                                        let (px, py) = match rect.position {
-                                            tauri::Position::Physical(p) => {
-                                                (p.x as f64, p.y as f64)
-                                            }
-                                            tauri::Position::Logical(l) => (l.x, l.y),
-                                        };
-                                        let (sw, sh) = match rect.size {
-                                            tauri::Size::Physical(p) => {
-                                                (p.width as f64, p.height as f64)
-                                            }
-                                            tauri::Size::Logical(l) => (l.width, l.height),
-                                        };
-                                        let x = px - 160.0 + (sw / 2.0);
-                                        let y = py + sh; // Position below the tray icon
-                                        let _ = popup.set_position(PhysicalPosition::new(
-                                            x as i32, y as i32,
-                                        ));
-                                    }
-                                    let _ = popup.show();
-                                    let _ = popup.set_focus();
-                                    let _ = app.emit_to("tray-popup", "refresh-contacts", ());
+                            let state = app.state::<TrayState>();
+
+                            // If a double-click occurred within 500ms, ignore this trailing single click
+                            if let Some(last_dbl) = *state.last_double_click.lock().unwrap() {
+                                if last_dbl.elapsed() < std::time::Duration::from_millis(500) {
+                                    return;
                                 }
                             }
+
+                            // Cancel any pending click task to debounce rapid/rigorous clicking
+                            if let Some(task) = state.click_task.lock().unwrap().take() {
+                                task.abort();
+                            }
+
+                            let app_clone = app.clone();
+                            let tray_clone = tray.clone();
+
+                            let task = tauri::async_runtime::spawn(async move {
+                                // Delay single-click processing to allow a double-click to cancel it
+                                tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+
+                                if let Some(popup) = app_clone.get_webview_window("tray-popup") {
+                                    if popup.is_visible().unwrap_or(false) {
+                                        let _ = popup.hide();
+                                    } else {
+                                        // Position popup dynamically based on taskbar/tray icon position
+                                        if let Ok(Some(rect)) = tray_clone.rect() {
+                                            // Get monitor dimensions (usually primary monitor contains the taskbar/tray)
+                                            let (monitor_x, monitor_y, monitor_w, monitor_h) = if let Ok(Some(monitor)) = app_clone.primary_monitor() {
+                                                let pos = monitor.position();
+                                                let size = monitor.size();
+                                                (pos.x as f64, pos.y as f64, size.width as f64, size.height as f64)
+                                            } else {
+                                                (0.0, 0.0, 1920.0, 1080.0)
+                                            };
+
+                                            let (px, py) = match rect.position {
+                                                tauri::Position::Physical(p) => {
+                                                    (p.x as f64, p.y as f64)
+                                                }
+                                                tauri::Position::Logical(l) => (l.x, l.y),
+                                            };
+                                            let (sw, sh) = match rect.size {
+                                                tauri::Size::Physical(p) => {
+                                                    (p.width as f64, p.height as f64)
+                                                }
+                                                tauri::Size::Logical(l) => (l.width, l.height),
+                                            };
+
+                                            let popup_width = 320.0;
+                                            let popup_height = 440.0;
+
+                                            let tray_center_x = px + (sw / 2.0);
+                                            let tray_center_y = py + (sh / 2.0);
+
+                                            // Determine which screen boundary the tray icon is closest to
+                                            let dist_bottom = (monitor_y + monitor_h) - tray_center_y;
+                                            let dist_top = tray_center_y - monitor_y;
+                                            let dist_right = (monitor_x + monitor_w) - tray_center_x;
+                                            let dist_left = tray_center_x - monitor_x;
+
+                                            let mut x = tray_center_x - (popup_width / 2.0);
+                                            let mut y = py + sh; // Default fallback to top/below
+
+                                            let min_dist = dist_bottom
+                                                .min(dist_top)
+                                                .min(dist_right)
+                                                .min(dist_left);
+
+                                            if min_dist == dist_bottom {
+                                                // Taskbar is at the bottom: place popup above tray icon
+                                                x = tray_center_x - (popup_width / 2.0);
+                                                y = py - popup_height;
+                                            } else if min_dist == dist_top {
+                                                // Taskbar is at the top: place popup below tray icon
+                                                x = tray_center_x - (popup_width / 2.0);
+                                                y = py + sh;
+                                            } else if min_dist == dist_right {
+                                                // Taskbar is on the right: place popup to the left of tray icon
+                                                x = px - popup_width;
+                                                y = tray_center_y - (popup_height / 2.0);
+                                            } else if min_dist == dist_left {
+                                                // Taskbar is on the left: place popup to the right of tray icon
+                                                x = px + sw;
+                                                y = tray_center_y - (popup_height / 2.0);
+                                            }
+
+                                            // Constraint to ensure the window fits completely inside the monitor bounds
+                                            x = x.max(monitor_x).min(monitor_x + monitor_w - popup_width);
+                                            y = y.max(monitor_y).min(monitor_y + monitor_h - popup_height);
+
+                                            let _ = popup.set_position(PhysicalPosition::new(
+                                                x as i32, y as i32,
+                                            ));
+                                        }
+                                        let _ = popup.show();
+                                        let _ = popup.set_focus();
+                                        let _ = app_clone.emit_to("tray-popup", "refresh-contacts", ());
+                                    }
+                                }
+                            });
+
+                            *state.click_task.lock().unwrap() = Some(task);
                         }
 
-                        // ---- Double-click → open main KaiBook window ----
+                        // ---- Double-click → open main KaiBook window, cancelling single-click ----
                         TrayIconEvent::DoubleClick {
                             button: MouseButton::Left,
                             ..
                         } => {
+                            let state = app.state::<TrayState>();
+
+                            // Abort any pending single-click task immediately
+                            if let Some(task) = state.click_task.lock().unwrap().take() {
+                                task.abort();
+                            }
+
+                            // Record the double-click timestamp
+                            *state.last_double_click.lock().unwrap() = Some(Instant::now());
+
                             if let Some(popup) = app.get_webview_window("tray-popup") {
                                 let _ = popup.hide();
                             }
