@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90">
+  <defs>
+    <radialGradient id="la-glow" cx="50%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#ff8800" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ff8800" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="90" height="90" rx="45" fill="#0a0a14"/>
+  <circle cx="45" cy="52" r="32" fill="url(#la-glow)"/>
+  <!-- horizon -->
+  <line x1="12" y1="58" x2="78" y2="58" stroke="#ff8800" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- lowering sun -->
+  <circle cx="45" cy="46" r="14" fill="#ffcc00"/>
+  <!-- short rays -->
+  <line x1="45" y1="20" x2="45" y2="28" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/>
+  <line x1="20" y1="46" x2="28" y2="46" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/>
+  <line x1="62" y1="46" x2="70" y2="46" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/>
+  <line x1="27" y1="28" x2="33" y2="34" stroke="#ffcc00" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="63" y1="28" x2="57" y2="34" stroke="#ffcc00" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

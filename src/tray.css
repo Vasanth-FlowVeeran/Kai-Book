@@ -26,8 +26,8 @@
   --stitch: #c5a55a;
   --radius: 6px;
   --radius-lg: 10px;
-  --font: 'Georgia', 'Times New Roman', serif;
-  --font-ui: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+  --font: 'Metrophobic', 'Georgia', 'Times New Roman', serif;
+  --font-ui: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
   --transition: 120ms ease;
 }
 
@@ -44,7 +44,7 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   height: 100vh;
-  padding: 6px;
+  padding: 0;
 }
 
 .hidden { display: none !important; }
@@ -94,6 +94,7 @@ body {
   gap: 8px;
   padding: 10px 14px;
   border-bottom: 1px solid var(--leather-edge);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .search-icon {
@@ -121,9 +122,20 @@ body {
    ============================================ */
 .tray-list {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: scroll;
   padding: 4px 6px;
   background: var(--paper);
+  transition: filter 0.2s ease;
+}
+
+/* Blur the contact list when quick-add form is open */
+.qa:not(.hidden) ~ .tray-footer,
+.tray-list:has(~ .qa:not(.hidden)) {
+  /* handled via JS class for broader compat */
+}
+body.qa-open .tray-list {
+  filter: blur(3px);
+  pointer-events: none;
 }
 
 /* Single contact row */
@@ -148,6 +160,63 @@ body {
 
 .contact-row.copied {
   background: rgba(42, 106, 58, 0.1);
+}
+
+/* Avatar wrapper — holds avatar + TOD badge */
+.avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+}
+
+/* Time-of-day badge */
+.tod-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 1.5px var(--paper);
+  z-index: 1;
+  cursor: default;
+}
+.tod-badge img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Custom tooltip for TOD badge */
+.avatar-wrap:hover .tod-badge::after {
+  opacity: 1;
+}
+.tod-badge::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-20%);
+  background: rgba(20, 15, 10, 0.92);
+  color: #f5f0e8;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 1000;
+  line-height: 1.3;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
 
 /* Avatar */
@@ -262,6 +331,60 @@ body {
   color: var(--ink-muted);
   font-family: var(--font);
   font-style: italic;
+}
+
+/* ============================================
+   Pagination
+   ============================================ */
+.tray-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 0 4px;
+}
+
+.tray-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--paper-shadow);
+  background: var(--cream);
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.tray-page-btn:hover:not(.disabled) {
+  background: var(--gold-light);
+  color: var(--leather-dark);
+  border-color: var(--gold);
+}
+.tray-page-btn.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.tray-page-info {
+  font-size: 11px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
+}
+
+/* Dark mode pagination */
+body.dark-mode .tray-page-btn {
+  background-color: rgba(255,240,220,0.04);
+  border-color: rgba(255,240,220,0.08);
+  color: var(--ink-muted);
+}
+body.dark-mode .tray-page-btn:hover:not(.disabled) {
+  background-color: rgba(197,149,58,0.15);
+  color: var(--gold-light);
+  border-color: var(--gold);
 }
 
 /* ============================================
@@ -403,6 +526,7 @@ select.qa-input option {
   padding: 4px 6px;
   gap: 2px;
   background: linear-gradient(135deg, var(--leather), var(--leather-dark));
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.05),
     inset 0 -1px 0 rgba(0,0,0,0.4);
@@ -443,6 +567,44 @@ select.qa-input option {
 .tray-action--danger:hover {
   background: rgba(139, 58, 58, 0.2);
   color: #d88;
+}
+
+/* ============================================
+   Light Mode — white chrome (all themes except cyberpunk)
+   ============================================ */
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-search {
+  background: #fff;
+  border-bottom-color: var(--paper-shadow);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .search-icon {
+  color: var(--ink-faint);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-search input {
+  color: var(--ink);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-search input::placeholder {
+  color: var(--ink-faint);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-footer {
+  background: #fff;
+  border-top-color: var(--paper-shadow);
+  box-shadow: none;
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-action {
+  color: var(--ink-muted);
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-action:hover {
+  background: rgba(0,0,0,0.04);
+  color: var(--gold);
+  box-shadow: none;
+}
+body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-action--danger:hover {
+  background: rgba(200,50,50,0.06);
+  color: #c44;
 }
 
 /* ============================================
@@ -507,7 +669,7 @@ body.dark-mode .qa {
 }
 
 body.dark-mode .qa-input {
-  background: rgba(0,0,0,0.2);
+  background-color: rgba(0,0,0,0.2);
   border-color: rgba(255,240,220,0.06);
   box-shadow:
     inset 0 2px 4px rgba(0,0,0,0.2),

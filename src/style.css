@@ -31,8 +31,8 @@
   --radius: 6px;
   --radius-lg: 10px;
   --radius-xl: 14px;
-  --font: 'Georgia', 'Times New Roman', 'Palatino', serif;
-  --font-ui: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+  --font: 'Metrophobic', 'Georgia', 'Times New Roman', 'Palatino', serif;
+  --font-ui: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
   --transition: 180ms ease;
 
   /* Noise texture as inline SVG data URI */
@@ -365,7 +365,7 @@ body {
   padding: 16px 18px;
   transition: all var(--transition);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.8),
     inset 0 -1px 0 rgba(0,0,0,0.06),
@@ -389,6 +389,63 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Avatar wrapper — holds avatar + TOD badge */
+.card-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+/* Time-of-day badge */
+.tod-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px var(--paper);
+  z-index: 1;
+  cursor: default;
+}
+.tod-badge img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Custom tooltip for TOD badge — anchored to avatar wrap */
+.card-avatar-wrap:hover .tod-badge::after {
+  opacity: 1;
+}
+.tod-badge::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 22px);
+  left: 50%;
+  transform: translateX(-30%);
+  background: rgba(20, 15, 10, 0.92);
+  color: #f5f0e8;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 1000;
+  line-height: 1.3;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .card-avatar {
@@ -549,6 +606,56 @@ body {
   background: linear-gradient(135deg, #f8e0e0, #f0d0d0);
   border-color: #d0a0a0;
   color: var(--red-leather);
+}
+
+/* ============================================
+   Pagination
+   ============================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px 0 6px;
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--paper-shadow);
+  background: linear-gradient(135deg, var(--cream), var(--paper-dark));
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.4),
+    0 1px 2px rgba(0,0,0,0.08);
+}
+.page-btn:hover:not(.disabled) {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: var(--leather-dark);
+  border-color: var(--gold-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.25),
+    0 2px 4px rgba(0,0,0,0.15);
+}
+.page-btn.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.page-info {
+  font-size: 13px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
 }
 
 /* Add button — dashed like a form field */

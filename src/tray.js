@@ -3,6 +3,9 @@
 // ============================================
 
 let contacts = [];
+var trayPage = 0;
+var TRAY_PAGE_SIZE = 10;
+var TRAY_MAX_PAGES = 2;
 
 async function invoke(cmd, args) {
   return window.__TAURI__.core.invoke(cmd, args || {});
@@ -77,6 +80,7 @@ async function init() {
     if (p.uiTheme) {
       document.body.setAttribute("data-theme", p.uiTheme);
     }
+    renderContacts();
   });
 }
 
@@ -120,7 +124,19 @@ function renderContacts() {
       })
     : contacts;
 
-  if (filtered.length === 0) {
+  // Cap to max contacts (TRAY_MAX_PAGES * TRAY_PAGE_SIZE)
+  var maxContacts = TRAY_MAX_PAGES * TRAY_PAGE_SIZE;
+  var capped = filtered.slice(0, maxContacts);
+  var totalPages = Math.ceil(capped.length / TRAY_PAGE_SIZE) || 1;
+
+  // Clamp current page
+  if (trayPage >= totalPages) trayPage = totalPages - 1;
+  if (trayPage < 0) trayPage = 0;
+
+  var start = trayPage * TRAY_PAGE_SIZE;
+  var pageItems = capped.slice(start, start + TRAY_PAGE_SIZE);
+
+  if (capped.length === 0) {
     list.innerHTML =
       '<div class="tray-empty">' +
         '<div class="tray-empty-icon">' + (q ? "🔍" : "📇") + '</div>' +
@@ -129,11 +145,14 @@ function renderContacts() {
     return;
   }
 
-  list.innerHTML = filtered.map(function (c) {
+  var rows = pageItems.map(function (c) {
     var sub = c.emailPrimary || c.phonePrimary || "";
     return (
       '<div class="contact-row" data-id="' + c.id + '">' +
-        '<div class="avatar" style="background:' + avatarGradient(c.name) + '">' + initial(c.name) + '</div>' +
+        '<div class="avatar-wrap">' +
+          '<div class="avatar" style="background:' + avatarGradient(c.name) + '">' + initial(c.name) + '</div>' +
+          todBadge(c.timezone) +
+        '</div>' +
         '<div class="contact-info">' +
           '<div class="contact-name">' + esc(c.name) + '</div>' +
           (sub ? '<div class="contact-detail">' + esc(sub) + '</div>' : '') +
@@ -143,6 +162,23 @@ function renderContacts() {
     );
   }).join("");
 
+  // Pagination controls
+  var paginationHtml = '';
+  if (totalPages > 1) {
+    paginationHtml = '<div class="tray-pagination">' +
+      '<button type="button" class="tray-page-btn' + (trayPage === 0 ? ' disabled' : '') + '" id="tray-page-prev">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>' +
+      '</button>' +
+      '<span class="tray-page-info">' + (trayPage + 1) + ' / ' + totalPages + '</span>' +
+      '<button type="button" class="tray-page-btn' + (trayPage >= totalPages - 1 ? ' disabled' : '') + '" id="tray-page-next">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+      '</button>' +
+    '</div>';
+  }
+
+  list.innerHTML = rows + paginationHtml;
+
+  // Bind contact row clicks
   list.querySelectorAll(".contact-row").forEach(function (row) {
     row.addEventListener("click", function () {
       var c = contacts.find(function (x) { return x.id === row.dataset.id; });
@@ -153,6 +189,22 @@ function renderContacts() {
       });
     });
   });
+
+  // Bind pagination buttons
+  var prevBtn = document.getElementById("tray-page-prev");
+  var nextBtn = document.getElementById("tray-page-next");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (trayPage > 0) { trayPage--; renderContacts(); }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (trayPage < totalPages - 1) { trayPage++; renderContacts(); }
+    });
+  }
 }
 
 // ============================================
@@ -163,6 +215,23 @@ function startClock() {
     document.querySelectorAll(".time-badge").forEach(function (el) {
       var tz = el.dataset.timezone;
       if (tz) el.textContent = fmtTime(tz);
+    });
+    // Update TOD badges — only re-roll phrase when period actually changes
+    document.querySelectorAll(".tod-badge").forEach(function (el) {
+      var row = el.closest(".contact-row");
+      if (!row) return;
+      var badge = row.querySelector(".time-badge");
+      var tz = badge ? badge.dataset.timezone : "";
+      if (!tz) return;
+      var period = todPeriod(tz);
+      var oldPeriod = el.dataset.period || "";
+      if (period !== oldPeriod) {
+        el.dataset.period = period;
+        el.className = "tod-badge tod-" + period;
+        el.dataset.tip = todPhrase(period);
+        var img = el.querySelector("img");
+        if (img) img.src = todIconSrc(period);
+      }
     });
   }, 1000);
 }
@@ -176,17 +245,121 @@ function fmtTime(tz) {
 }
 
 // ============================================
+// Time-of-day status indicator
+// ============================================
+function getHourIn(tz) {
+  try {
+    return parseInt(new Date().toLocaleString("en-US", { timeZone: tz, hour: "numeric", hour12: false }), 10);
+  } catch (e) { return -1; }
+}
+
+function todPeriod(tz) {
+  var h = getHourIn(tz);
+  if (h < 0) return "unknown";
+  if (h >= 5 && h < 8) return "early-morning";
+  if (h >= 8 && h < 12) return "late-morning";
+  if (h >= 12 && h < 15) return "early-afternoon";
+  if (h >= 15 && h < 17) return "late-afternoon";
+  if (h >= 17 && h < 19) return "early-evening";
+  if (h >= 19 && h < 22) return "evening";
+  return "night"; // 22-4
+}
+
+var TOD_PHRASES = {
+  "early-morning": [
+    "Probably still hitting snooze",
+    "Coffee hasn't kicked in yet",
+    "Maybe wait for their first coffee",
+    "They might be mid-yawn",
+    "Dawn patrol — tread lightly",
+    "Give them 30 more minutes"
+  ],
+  "late-morning": [
+    "Good time to reach out!",
+    "They're warmed up — go for it",
+    "Sweet spot — fully caffeinated",
+    "Prime time to ping them",
+    "They're in the zone, say hi!",
+    "Green light — send that message"
+  ],
+  "early-afternoon": [
+    "Post-lunch — might be slow to reply",
+    "Could be in a food coma",
+    "They're around, fire away",
+    "Afternoon mode — fair game",
+    "Probably at their desk",
+    "Good window — catch them now"
+  ],
+  "late-afternoon": [
+    "Winding down soon",
+    "Still working — get in quick",
+    "Last chance before EOD",
+    "Clock is ticking on their day",
+    "Catch them before they log off",
+    "Now or wait till tomorrow"
+  ],
+  "early-evening": [
+    "They're off the clock",
+    "Dinner time — maybe wait",
+    "Personal time — keep it short",
+    "Unless it's urgent, hold off",
+    "They've mentally checked out",
+    "Evening vibes — not ideal"
+  ],
+  "evening": [
+    "Couch mode activated",
+    "Netflix > your message right now",
+    "Save it for tomorrow",
+    "They won't thank you for this ping",
+    "Let them enjoy their evening",
+    "Tomorrow is a better bet"
+  ],
+  "night": [
+    "They're counting sheep",
+    "Shhh... they're sleeping",
+    "Do not disturb!",
+    "Schedule this for morning",
+    "Zzz... definitely wait",
+    "Their phone is on silent (hopefully)"
+  ],
+  "unknown": [""]
+};
+
+function todPhrase(period) {
+  var phrases = TOD_PHRASES[period] || [""];
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function todIconSrc(period) {
+  var theme = document.body.getAttribute("data-theme");
+  if (theme === "cyberpunk") return "assets/tod/cyberpunk/" + period + ".svg";
+  return "assets/tod/" + period + ".png";
+}
+
+function todBadge(tz) {
+  if (!tz) return '';
+  var period = todPeriod(tz);
+  if (period === 'unknown') return '';
+  var phrase = todPhrase(period);
+  return '<span class="tod-badge tod-' + period + '" data-tip="' + phrase + '" data-period="' + period + '">' +
+    '<img src="' + todIconSrc(period) + '" alt="' + phrase + '">' +
+    '</span>';
+}
+
+// ============================================
 // Quick Add
 // ============================================
 function showQA() {
   document.getElementById("quick-add-form").classList.remove("hidden");
   document.getElementById("tray-actions").classList.add("hidden");
+  document.body.classList.add("qa-open");
   document.getElementById("qa-name").focus();
 }
 
 function hideQA() {
   document.getElementById("quick-add-form").classList.add("hidden");
   document.getElementById("tray-actions").classList.remove("hidden");
+  document.body.classList.remove("qa-open");
   ["qa-name", "qa-email", "qa-phone", "qa-timezone"].forEach(function (id) {
     document.getElementById(id).value = "";
   });
@@ -195,6 +368,11 @@ function hideQA() {
 async function saveQA() {
   var name = document.getElementById("qa-name").value.trim();
   if (!name) { document.getElementById("qa-name").focus(); return; }
+
+  if (contacts.length >= TRAY_MAX_PAGES * TRAY_PAGE_SIZE) {
+    alert("Maximum of " + (TRAY_MAX_PAGES * TRAY_PAGE_SIZE) + " contacts reached.");
+    return;
+  }
 
   var now = new Date().toISOString();
   contacts.push({
@@ -222,7 +400,10 @@ async function saveQA() {
 // Events
 // ============================================
 function bindEvents() {
-  document.getElementById("tray-search-input").addEventListener("input", renderContacts);
+  document.getElementById("tray-search-input").addEventListener("input", function () {
+    trayPage = 0;
+    renderContacts();
+  });
   document.getElementById("tray-quick-add").addEventListener("click", showQA);
   document.getElementById("qa-cancel").addEventListener("click", hideQA);
   document.getElementById("qa-save").addEventListener("click", saveQA);

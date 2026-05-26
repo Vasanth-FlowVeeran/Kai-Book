@@ -123,6 +123,123 @@ const MOCK_CONTACTS = [
     createdAt: "2026-05-24T08:00:00Z",
     updatedAt: "2026-05-24T08:00:00Z",
   },
+  {
+    id: "c004",
+    name: "Yuki Tanaka",
+    emailPrimary: "yuki@studiocraft.jp",
+    emailSecondary: "",
+    phonePrimary: "+81 90-1234-5678",
+    phoneSecondary: "",
+    address: "Shibuya, Tokyo, Japan",
+    timezone: "Asia/Tokyo",
+    notes: "UX designer. Prefers async comms.",
+    createdAt: "2026-05-22T06:00:00Z",
+    updatedAt: "2026-05-22T06:00:00Z",
+  },
+  {
+    id: "c005",
+    name: "Liam O'Brien",
+    emailPrimary: "liam@greenfield.ie",
+    emailSecondary: "liam.obrien@proton.me",
+    phonePrimary: "+353 87 123 4567",
+    phoneSecondary: "",
+    address: "Dublin 2, Ireland",
+    timezone: "Europe/Dublin",
+    notes: "Full-stack dev. Usually online 9-6 GMT.",
+    createdAt: "2026-05-22T10:00:00Z",
+    updatedAt: "2026-05-22T10:00:00Z",
+  },
+  {
+    id: "c006",
+    name: "Fatima Al-Rashid",
+    emailPrimary: "fatima@nexustech.ae",
+    emailSecondary: "",
+    phonePrimary: "+971 50 987 6543",
+    phoneSecondary: "",
+    address: "DIFC, Dubai, UAE",
+    timezone: "Asia/Dubai",
+    notes: "Product manager. Responds quickly on Slack.",
+    createdAt: "2026-05-23T08:00:00Z",
+    updatedAt: "2026-05-23T08:00:00Z",
+  },
+  {
+    id: "c007",
+    name: "Carlos Rivera",
+    emailPrimary: "carlos@pixelworks.mx",
+    emailSecondary: "",
+    phonePrimary: "+52 55 1234 5678",
+    phoneSecondary: "",
+    address: "Roma Norte, Mexico City, Mexico",
+    timezone: "America/Mexico_City",
+    notes: "Motion designer. Night owl — often online late.",
+    createdAt: "2026-05-23T11:00:00Z",
+    updatedAt: "2026-05-23T11:00:00Z",
+  },
+  {
+    id: "c008",
+    name: "Sophie Laurent",
+    emailPrimary: "sophie@artisancode.fr",
+    emailSecondary: "s.laurent@gmail.com",
+    phonePrimary: "+33 6 12 34 56 78",
+    phoneSecondary: "",
+    address: "Le Marais, Paris, France",
+    timezone: "Europe/Paris",
+    notes: "Frontend specialist. Prefers email.",
+    createdAt: "2026-05-24T07:00:00Z",
+    updatedAt: "2026-05-24T07:00:00Z",
+  },
+  {
+    id: "c009",
+    name: "Oluwaseun Adeyemi",
+    emailPrimary: "seun@lagosbytes.ng",
+    emailSecondary: "",
+    phonePrimary: "+234 803 456 7890",
+    phoneSecondary: "",
+    address: "Victoria Island, Lagos, Nigeria",
+    timezone: "Africa/Lagos",
+    notes: "Backend engineer. Very responsive on WhatsApp.",
+    createdAt: "2026-05-24T09:00:00Z",
+    updatedAt: "2026-05-24T09:00:00Z",
+  },
+  {
+    id: "c010",
+    name: "Emma Johansson",
+    emailPrimary: "emma@nordicpixels.se",
+    emailSecondary: "",
+    phonePrimary: "+46 70 123 4567",
+    phoneSecondary: "",
+    address: "Södermalm, Stockholm, Sweden",
+    timezone: "Europe/Stockholm",
+    notes: "Illustrator. Part-time — available Mon/Wed/Fri.",
+    createdAt: "2026-05-24T12:00:00Z",
+    updatedAt: "2026-05-24T12:00:00Z",
+  },
+  {
+    id: "c011",
+    name: "James Walker",
+    emailPrimary: "james@outbackdev.au",
+    emailSecondary: "",
+    phonePrimary: "+61 4 1234 5678",
+    phoneSecondary: "",
+    address: "Surry Hills, Sydney, Australia",
+    timezone: "Australia/Sydney",
+    notes: "DevOps lead. Early riser — best before noon AEST.",
+    createdAt: "2026-05-25T03:00:00Z",
+    updatedAt: "2026-05-25T03:00:00Z",
+  },
+  {
+    id: "c012",
+    name: "Priya Nair",
+    emailPrimary: "priya@cloudleap.in",
+    emailSecondary: "priya.nair@yahoo.com",
+    phonePrimary: "+91 98765 12345",
+    phoneSecondary: "",
+    address: "Indiranagar, Bangalore, India",
+    timezone: "Asia/Kolkata",
+    notes: "Data scientist. Prefers scheduled calls over async.",
+    createdAt: "2026-05-25T05:30:00Z",
+    updatedAt: "2026-05-25T05:30:00Z",
+  },
 ];
 
 // ============================================
@@ -132,6 +249,10 @@ let contacts = [];
 let searchQuery = "";
 let editingId = null;
 let confirmCallback = null;
+let currentPage = 0;
+const PAGE_SIZE = 10;
+const MAX_PAGES = 2;
+const MAX_CONTACTS = MAX_PAGES * PAGE_SIZE;
 
 // ============================================
 // THEME (dark mode + UI themes)
@@ -193,6 +314,8 @@ function setUITheme(themeName) {
     c.classList.toggle("active", c.dataset.theme === themeName);
   });
   syncNativeTheme();
+  // Re-render contacts so TOD icons swap for cyberpunk
+  renderContacts();
   // Persist to shared file
   if (IS_TAURI) {
     tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: themeName } });
@@ -280,6 +403,23 @@ function startLiveClock() {
       const tz = el.dataset.timezone;
       if (tz) el.textContent = formatTime(tz);
     });
+    // Update TOD badges — only re-roll phrase when period actually changes
+    document.querySelectorAll(".tod-badge").forEach((el) => {
+      const card = el.closest(".card");
+      if (!card) return;
+      const timeEl = card.querySelector(".card-time");
+      const tz = timeEl ? timeEl.dataset.timezone : "";
+      if (!tz) return;
+      const period = todPeriod(tz);
+      const oldPeriod = el.dataset.period || "";
+      if (period !== oldPeriod) {
+        el.dataset.period = period;
+        el.className = `tod-badge tod-${period}`;
+        el.dataset.tip = todPhrase(period);
+        const img = el.querySelector("img");
+        if (img) img.src = todIconSrc(period);
+      }
+    });
   }, 1000);
 }
 
@@ -297,11 +437,114 @@ function formatTime(ianaZone) {
 }
 
 // ============================================
+// TIME-OF-DAY STATUS INDICATOR
+// ============================================
+function getHourIn(tz) {
+  try {
+    return parseInt(new Date().toLocaleString("en-US", { timeZone: tz, hour: "numeric", hour12: false }), 10);
+  } catch (e) { return -1; }
+}
+
+function todPeriod(tz) {
+  const h = getHourIn(tz);
+  if (h < 0) return "unknown";
+  if (h >= 5 && h < 8) return "early-morning";
+  if (h >= 8 && h < 12) return "late-morning";
+  if (h >= 12 && h < 15) return "early-afternoon";
+  if (h >= 15 && h < 17) return "late-afternoon";
+  if (h >= 17 && h < 19) return "early-evening";
+  if (h >= 19 && h < 22) return "evening";
+  return "night"; // 22-4
+}
+
+const TOD_PHRASES = {
+  "early-morning": [
+    "Probably still hitting snooze",
+    "Coffee hasn't kicked in yet",
+    "Maybe wait for their first coffee",
+    "They might be mid-yawn",
+    "Dawn patrol — tread lightly",
+    "Give them 30 more minutes"
+  ],
+  "late-morning": [
+    "Good time to reach out!",
+    "They're warmed up — go for it",
+    "Sweet spot — fully caffeinated",
+    "Prime time to ping them",
+    "They're in the zone, say hi!",
+    "Green light — send that message"
+  ],
+  "early-afternoon": [
+    "Post-lunch — might be slow to reply",
+    "Could be in a food coma",
+    "They're around, fire away",
+    "Afternoon mode — fair game",
+    "Probably at their desk",
+    "Good window — catch them now"
+  ],
+  "late-afternoon": [
+    "Winding down soon",
+    "Still working — get in quick",
+    "Last chance before EOD",
+    "Clock is ticking on their day",
+    "Catch them before they log off",
+    "Now or wait till tomorrow"
+  ],
+  "early-evening": [
+    "They're off the clock",
+    "Dinner time — maybe wait",
+    "Personal time — keep it short",
+    "Unless it's urgent, hold off",
+    "They've mentally checked out",
+    "Evening vibes — not ideal"
+  ],
+  "evening": [
+    "Couch mode activated",
+    "Netflix > your message right now",
+    "Save it for tomorrow",
+    "They won't thank you for this ping",
+    "Let them enjoy their evening",
+    "Tomorrow is a better bet"
+  ],
+  "night": [
+    "They're counting sheep",
+    "Shhh... they're sleeping",
+    "Do not disturb!",
+    "Schedule this for morning",
+    "Zzz... definitely wait",
+    "Their phone is on silent (hopefully)"
+  ],
+  "unknown": [""]
+};
+
+function todPhrase(period) {
+  const phrases = TOD_PHRASES[period] || [""];
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function todIconSrc(period) {
+  const theme = document.body.getAttribute("data-theme");
+  if (theme === "cyberpunk") return `assets/tod/cyberpunk/${period}.svg`;
+  return `assets/tod/${period}.png`;
+}
+
+function todBadge(tz) {
+  if (!tz) return "";
+  const period = todPeriod(tz);
+  if (period === "unknown") return "";
+  const phrase = todPhrase(period);
+  return `<span class="tod-badge tod-${period}" data-tip="${phrase}" data-period="${period}">
+    <img src="${todIconSrc(period)}" alt="${phrase}">
+  </span>`;
+}
+
+// ============================================
 // EVENT BINDINGS
 // ============================================
 function bindEvents() {
   document.getElementById("main-search").addEventListener("input", (e) => {
     searchQuery = e.target.value.toLowerCase();
+    currentPage = 0;
     renderContacts();
   });
 
@@ -386,7 +629,18 @@ function renderContacts() {
       )
     : contacts;
 
-  if (filtered.length === 0 && !searchQuery) {
+  // Cap to max contacts
+  const capped = filtered.slice(0, MAX_CONTACTS);
+  const totalPages = Math.ceil(capped.length / PAGE_SIZE) || 1;
+
+  // Clamp current page
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  if (currentPage < 0) currentPage = 0;
+
+  const start = currentPage * PAGE_SIZE;
+  const pageItems = capped.slice(start, start + PAGE_SIZE);
+
+  if (capped.length === 0 && !searchQuery) {
     empty.classList.remove("hidden");
     list.innerHTML = "";
     return;
@@ -394,7 +648,7 @@ function renderContacts() {
 
   empty.classList.add("hidden");
 
-  list.innerHTML = filtered
+  const cards = pageItems
     .map((c) => {
       // Build subtitle line (email + phone)
       const subParts = [];
@@ -432,7 +686,10 @@ function renderContacts() {
       return `
       <div class="card" data-id="${c.id}">
         <div class="card-top">
-          <div class="card-avatar" style="background:${avatarGradient(c.name)}">${initial(c.name)}</div>
+          <div class="card-avatar-wrap">
+            <div class="card-avatar" style="background:${avatarGradient(c.name)}">${initial(c.name)}</div>
+            ${todBadge(c.timezone)}
+          </div>
           <div class="card-main">
             <div class="card-name">${escapeHtml(c.name)}</div>
             ${subLine}
@@ -447,6 +704,25 @@ function renderContacts() {
       </div>`;
     })
     .join("");
+
+  // Pagination controls
+  let paginationHtml = "";
+  if (totalPages > 1) {
+    paginationHtml = `
+    <div class="pagination">
+      <button type="button" class="page-btn${currentPage === 0 ? " disabled" : ""}" id="page-prev">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Prev
+      </button>
+      <span class="page-info">${currentPage + 1} / ${totalPages}</span>
+      <button type="button" class="page-btn${currentPage >= totalPages - 1 ? " disabled" : ""}" id="page-next">
+        Next
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>`;
+  }
+
+  list.innerHTML = cards + paginationHtml;
 
   // Bind card action buttons
   list.querySelectorAll(".card-action.edit").forEach((btn) => {
@@ -464,6 +740,20 @@ function renderContacts() {
       if (contact) confirmDelete(contact);
     });
   });
+
+  // Bind pagination buttons
+  const prevBtn = document.getElementById("page-prev");
+  const nextBtn = document.getElementById("page-next");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 0) { currentPage--; renderContacts(); }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages - 1) { currentPage++; renderContacts(); }
+    });
+  }
 }
 
 // ============================================
@@ -528,6 +818,10 @@ async function handleFormSubmit(e) {
       };
     }
   } else {
+    if (contacts.length >= MAX_CONTACTS) {
+      alert(`Maximum of ${MAX_CONTACTS} contacts reached.`);
+      return;
+    }
     contacts.push({
       ...formData,
       id: generateId(),

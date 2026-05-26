@@ -101,6 +101,7 @@ fn save_theme(settings: ThemeSettings) -> Result<(), String> {
 
 /// Load contacts from ~/.kaibook/contacts.json.
 /// Returns an empty array if the file doesn't exist yet.
+/// Handles both `{ "contacts": [...] }` and bare `[...]` formats.
 #[tauri::command]
 fn load_contacts() -> Result<Vec<Contact>, String> {
     let path = contacts_path()?;
@@ -108,9 +109,14 @@ fn load_contacts() -> Result<Vec<Contact>, String> {
         return Ok(vec![]);
     }
     let data = fs::read_to_string(&path).map_err(|e| format!("Read error: {e}"))?;
-    let file: ContactsFile =
-        serde_json::from_str(&data).map_err(|e| format!("Parse error: {e}"))?;
-    Ok(file.contacts)
+    // Try wrapped format first, then bare array
+    if let Ok(file) = serde_json::from_str::<ContactsFile>(&data) {
+        return Ok(file.contacts);
+    }
+    if let Ok(contacts) = serde_json::from_str::<Vec<Contact>>(&data) {
+        return Ok(contacts);
+    }
+    Err("Parse error: invalid contacts.json format".to_string())
 }
 
 /// Save the full contacts array to ~/.kaibook/contacts.json.
