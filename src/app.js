@@ -134,22 +134,61 @@ let editingId = null;
 let confirmCallback = null;
 
 // ============================================
-// THEME (dark mode)
+// THEME (dark mode + UI themes)
 // ============================================
-function initTheme() {
-  const saved = localStorage.getItem("kaibook_theme");
-  if (saved === "dark") {
+async function initTheme() {
+  let darkMode = false;
+  let uiTheme = "skeuomorphic";
+  // Load from shared file via Rust command (works across webviews)
+  if (IS_TAURI) {
+    try {
+      const settings = await tauriInvoke("load_theme");
+      if (settings) {
+        darkMode = settings.darkMode;
+        uiTheme = settings.uiTheme || "skeuomorphic";
+      }
+    } catch (e) { console.warn("load_theme failed:", e); }
+  }
+  if (darkMode) {
     document.body.classList.add("dark-mode");
   }
+  document.body.setAttribute("data-theme", uiTheme);
+  // Highlight correct card in settings
+  setTimeout(() => {
+    document.querySelectorAll(".theme-card").forEach(c => {
+      c.classList.toggle("active", c.dataset.theme === uiTheme);
+    });
+  }, 0);
 }
 
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark-mode");
-  const theme = isDark ? "dark" : "light";
-  localStorage.setItem("kaibook_theme", theme);
-  // Notify tray popup of theme change
+  const uiTheme = document.body.getAttribute("data-theme") || "skeuomorphic";
+  // Persist to shared file
   if (IS_TAURI) {
-    window.__TAURI__.event.emit("theme-changed", { theme: theme });
+    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: uiTheme } });
+    // Notify tray popup immediately
+    window.__TAURI__.event.emit("theme-changed", {
+      theme: isDark ? "dark" : "light",
+      uiTheme: uiTheme
+    });
+  }
+}
+
+function setUITheme(themeName) {
+  document.body.setAttribute("data-theme", themeName);
+  const isDark = document.body.classList.contains("dark-mode");
+  document.querySelectorAll(".theme-card").forEach(c => {
+    c.classList.toggle("active", c.dataset.theme === themeName);
+  });
+  // Persist to shared file
+  if (IS_TAURI) {
+    tauriInvoke("save_theme", { settings: { darkMode: isDark, uiTheme: themeName } });
+    // Notify tray popup immediately
+    window.__TAURI__.event.emit("theme-changed", {
+      theme: isDark ? "dark" : "light",
+      uiTheme: themeName
+    });
   }
 }
 
@@ -157,7 +196,7 @@ function toggleTheme() {
 // INITIALIZATION
 // ============================================
 async function init() {
-  initTheme();
+  await initTheme();
   await loadContacts();
   populateTimezoneDropdown();
   startLiveClock();
@@ -269,6 +308,13 @@ function bindEvents() {
 
   document.getElementById("btn-settings").addEventListener("click", () => showPage("settings"));
   document.getElementById("btn-back-settings").addEventListener("click", () => showPage("main"));
+
+  // Theme grid
+  document.getElementById("theme-grid").addEventListener("click", (e) => {
+    const card = e.target.closest(".theme-card");
+    if (!card || !card.dataset.theme) return;
+    setUITheme(card.dataset.theme);
+  });
 
   document.getElementById("btn-export").addEventListener("click", exportContacts);
   document.getElementById("btn-import").addEventListener("click", () => {

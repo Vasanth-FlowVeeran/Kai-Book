@@ -55,7 +55,7 @@ var COMMON_TZ = [
 // Init
 // ============================================
 async function init() {
-  initTheme();
+  await initTheme();
   await loadContacts();
   populateTZ();
   bindEvents();
@@ -68,21 +68,27 @@ async function init() {
   });
 
   window.__TAURI__.event.listen("theme-changed", function (event) {
-    var theme = event.payload && event.payload.theme;
-    if (theme === "dark") {
+    var p = event.payload || {};
+    if (p.theme === "dark") {
       document.body.classList.add("dark-mode");
     } else {
       document.body.classList.remove("dark-mode");
     }
+    if (p.uiTheme) {
+      document.body.setAttribute("data-theme", p.uiTheme);
+    }
   });
 }
 
-function initTheme() {
+async function initTheme() {
   try {
-    if (localStorage.getItem("kaibook_theme") === "dark") {
+    var settings = await invoke("load_theme");
+    if (settings && settings.darkMode) {
       document.body.classList.add("dark-mode");
     }
-  } catch (e) { /* localStorage may not be available */ }
+    var uiTheme = (settings && settings.uiTheme) ? settings.uiTheme : "skeuomorphic";
+    document.body.setAttribute("data-theme", uiTheme);
+  } catch (e) { console.warn("load_theme failed:", e); }
 }
 
 async function loadContacts() {

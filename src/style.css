@@ -1093,6 +1093,140 @@ body.dark-mode .theme-toggle .icon-moon { display: none; }
 body.dark-mode .theme-toggle .icon-sun  { display: inline; }
 
 /* ============================================
+   Theme Selector Grid
+   ============================================ */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px 12px;
+  background: linear-gradient(135deg, var(--cream), var(--paper));
+  border: 2px solid var(--paper-shadow);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  font-family: var(--font-ui);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.6),
+    inset 0 -1px 0 rgba(0,0,0,0.05),
+    0 2px 4px rgba(0,0,0,0.08),
+    0 4px 8px rgba(0,0,0,0.04),
+    0 8px 16px rgba(0,0,0,0.02);
+}
+
+.theme-card:hover:not([disabled]) {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.7),
+    inset 0 -1px 0 rgba(0,0,0,0.05),
+    0 4px 8px rgba(0,0,0,0.12),
+    0 8px 16px rgba(0,0,0,0.06),
+    0 12px 24px rgba(0,0,0,0.03);
+}
+
+.theme-card.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--cream), var(--paper-dark));
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.7),
+    inset 0 -1px 0 rgba(0,0,0,0.08),
+    0 2px 4px rgba(0,0,0,0.1),
+    0 8px 16px rgba(0,0,0,0.06),
+    0 0 0 2px rgba(197,149,58,0.2);
+}
+
+
+.theme-swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.theme-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.2),
+    0 1px 2px rgba(0,0,0,0.15);
+}
+
+.theme-card-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.theme-card-check {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  background: var(--gold);
+  border-radius: 50%;
+  color: var(--leather-dark);
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.3),
+    0 1px 3px rgba(0,0,0,0.3);
+}
+
+.theme-card.active .theme-card-check {
+  display: flex;
+}
+
+
+/* ---- Dark mode: theme grid ---- */
+body.dark-mode .theme-card {
+  background: linear-gradient(135deg, #302a24, #28231e);
+  border-color: rgba(255,240,220,0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.04),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.3),
+    0 4px 8px rgba(0,0,0,0.15),
+    0 8px 16px rgba(0,0,0,0.08);
+}
+
+body.dark-mode .theme-card:hover:not([disabled]) {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 4px 8px rgba(0,0,0,0.35),
+    0 8px 16px rgba(0,0,0,0.2),
+    0 12px 24px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .theme-card.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #3a3428, #302a22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,240,220,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.3),
+    0 8px 16px rgba(0,0,0,0.15),
+    0 0 0 2px rgba(197,149,58,0.15);
+}
+
+body.dark-mode .theme-swatch {
+  border-color: rgba(255,240,220,0.1);
+}
+
+/* ============================================
    Dark Mode — aged leather by candlelight
    ============================================ */
 body.dark-mode {

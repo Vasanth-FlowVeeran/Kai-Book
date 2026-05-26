@@ -1,0 +1,982 @@
+/* ============================================
+   KaiBook — Theme Overrides
+   Each theme fully overhauls the UI personality.
+   Applied via body[data-theme="..."]
+   ============================================ */
+
+/* ============================================
+   1. NORDIC — Frost & fjords
+   Clean geometry, frosted glass, cool blue/gray
+   ============================================ */
+body[data-theme="nordic"] {
+  --leather: #3b4252;
+  --leather-light: #434c5e;
+  --leather-dark: #2e3440;
+  --leather-edge: #272d38;
+  --paper: #eceff4;
+  --paper-dark: #d8dee9;
+  --paper-shadow: #c0c8d4;
+  --cream: #f0f4f8;
+  --parchment: #e5e9f0;
+  --ink: #2e3440;
+  --ink-light: #3b4252;
+  --ink-muted: #6b7a8d;
+  --ink-faint: #9aa5b4;
+  --gold: #5e81ac;
+  --gold-light: #81a1c1;
+  --gold-dark: #4c6a92;
+  --red-leather: #bf616a;
+  --red-leather-light: #d08770;
+  --green-ink: #a3be8c;
+  --green-bg: rgba(163,190,140,0.12);
+  --stitch: transparent;
+  --noise: none;
+  --grain: none;
+  --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+}
+
+body[data-theme="nordic"] .toolbar {
+  background: linear-gradient(135deg, #434c5e, #3b4252);
+  border-bottom: 2px solid #2e3440;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 2px 4px rgba(0,0,0,0.15),
+    0 4px 12px rgba(0,0,0,0.1),
+    0 8px 24px rgba(0,0,0,0.06);
+}
+body[data-theme="nordic"] .toolbar::after { display: none; }
+
+body[data-theme="nordic"] .brand-name { color: #88c0d0; }
+
+body[data-theme="nordic"] .card {
+  background: linear-gradient(135deg, #f0f4f8, #e5e9f0);
+  border: 1px solid #c0c8d4;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    0 1px 3px rgba(0,0,0,0.06),
+    0 4px 12px rgba(0,0,0,0.04);
+}
+body[data-theme="nordic"] .card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    0 2px 6px rgba(0,0,0,0.08),
+    0 8px 20px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+body[data-theme="nordic"] .card-avatar {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  border: 2px solid rgba(255,255,255,0.5);
+}
+
+body[data-theme="nordic"] .card-time {
+  background: rgba(163,190,140,0.12);
+  color: #5a7a50;
+  border: 1px solid rgba(163,190,140,0.25);
+  box-shadow: none;
+}
+
+body[data-theme="nordic"] .btn-primary {
+  background: linear-gradient(135deg, #81a1c1, #5e81ac);
+  color: #fff;
+  border: 1px solid #4c6a92;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 2px 4px rgba(0,0,0,0.12),
+    0 4px 12px rgba(0,0,0,0.06);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+}
+body[data-theme="nordic"] .btn-primary:hover {
+  background: linear-gradient(135deg, #8fabc8, #6b8fb8);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    0 4px 8px rgba(0,0,0,0.15),
+    0 8px 20px rgba(0,0,0,0.08);
+}
+
+body[data-theme="nordic"] .modal {
+  border: 2px solid #3b4252;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    0 4px 12px rgba(0,0,0,0.12),
+    0 12px 32px rgba(0,0,0,0.1),
+    0 24px 48px rgba(0,0,0,0.06);
+}
+body[data-theme="nordic"] .modal::after { display: none; }
+body[data-theme="nordic"] .modal-header { background: linear-gradient(135deg, #434c5e, #3b4252); }
+body[data-theme="nordic"] .modal-header::after { display: none; }
+body[data-theme="nordic"] .modal-title { color: #88c0d0; }
+
+body[data-theme="nordic"] .confirm { border: 2px solid #3b4252; }
+body[data-theme="nordic"] .confirm::after { display: none; }
+
+body[data-theme="nordic"] .card-action {
+  background: linear-gradient(135deg, #f0f4f8, #e5e9f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+body[data-theme="nordic"] .setting-card {
+  background: linear-gradient(135deg, #f0f4f8, #e5e9f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+}
+
+body[data-theme="nordic"] .search-box {
+  background: rgba(0,0,0,0.15);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+}
+
+body[data-theme="nordic"] .hotkey-row kbd {
+  background: linear-gradient(135deg, #fff, #e5e9f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Nordic dark mode */
+body[data-theme="nordic"].dark-mode {
+  --leather: #2e3440;
+  --leather-light: #3b4252;
+  --leather-dark: #242933;
+  --leather-edge: #1e222a;
+  --paper: #3b4252;
+  --paper-dark: #353c4a;
+  --paper-shadow: #2e3440;
+  --cream: #434c5e;
+  --parchment: #3b4252;
+  --ink: #d8dee9;
+  --ink-light: #c0c8d4;
+  --ink-muted: #7b8a9e;
+  --ink-faint: #5a6576;
+  --green-ink: #a3be8c;
+  --green-bg: rgba(163,190,140,0.08);
+}
+body[data-theme="nordic"].dark-mode .card {
+  background: linear-gradient(135deg, #434c5e, #3b4252);
+  border-color: #2e3440;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 2px 6px rgba(0,0,0,0.25),
+    0 8px 20px rgba(0,0,0,0.15);
+}
+body[data-theme="nordic"].dark-mode .card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 4px 12px rgba(0,0,0,0.3),
+    0 12px 28px rgba(0,0,0,0.2);
+}
+body[data-theme="nordic"].dark-mode .card-action {
+  background: linear-gradient(135deg, #434c5e, #3b4252);
+  border-color: #2e3440;
+}
+body[data-theme="nordic"].dark-mode .setting-card {
+  background: linear-gradient(135deg, #434c5e, #3b4252);
+}
+body[data-theme="nordic"].dark-mode .modal {
+  border-color: #2e3440;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 24px 48px rgba(0,0,0,0.25);
+}
+body[data-theme="nordic"].dark-mode .confirm {
+  border-color: #2e3440;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 24px 48px rgba(0,0,0,0.25);
+}
+body[data-theme="nordic"].dark-mode .hotkey-row kbd {
+  background: linear-gradient(135deg, #434c5e, #3b4252);
+  border-color: #2e3440;
+}
+body[data-theme="nordic"].dark-mode .card-time {
+  border-color: rgba(163,190,140,0.15);
+}
+
+/* ============================================
+   2. ROSÉ PINE — Moonlit warmth
+   Deep base, muted purples & pinks, velvety
+   ============================================ */
+body[data-theme="rosepine"] {
+  --leather: #26233a;
+  --leather-light: #2a2740;
+  --leather-dark: #1f1d2e;
+  --leather-edge: #191724;
+  --paper: #faf4ed;
+  --paper-dark: #f2e9e1;
+  --paper-shadow: #ddd6ce;
+  --cream: #fffaf3;
+  --parchment: #f4ede4;
+  --ink: #575279;
+  --ink-light: #6e6a86;
+  --ink-muted: #9893a5;
+  --ink-faint: #b4afc2;
+  --gold: #ea9d34;
+  --gold-light: #f6c177;
+  --gold-dark: #d08b28;
+  --red-leather: #b4637a;
+  --red-leather-light: #d7827e;
+  --green-ink: #56949f;
+  --green-bg: rgba(86,148,159,0.1);
+  --stitch: transparent;
+  --noise: none;
+  --grain: none;
+  --font: 'Georgia', 'Times New Roman', serif;
+}
+
+body[data-theme="rosepine"] .toolbar {
+  background: linear-gradient(135deg, #2a2740, #26233a);
+  border-bottom: 2px solid #191724;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 2px 8px rgba(0,0,0,0.2),
+    0 8px 24px rgba(0,0,0,0.12);
+}
+body[data-theme="rosepine"] .toolbar::after { display: none; }
+body[data-theme="rosepine"] .brand-name { color: #c4a7e7; }
+
+body[data-theme="rosepine"] .card {
+  background: linear-gradient(135deg, #fffaf3, #f4ede4);
+  border: 1px solid #ddd6ce;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    0 2px 6px rgba(87,82,121,0.06),
+    0 6px 16px rgba(87,82,121,0.04);
+}
+body[data-theme="rosepine"] .card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    0 4px 12px rgba(87,82,121,0.08),
+    0 10px 24px rgba(87,82,121,0.05);
+  transform: translateY(-1px);
+}
+
+body[data-theme="rosepine"] .card-time {
+  color: #56949f;
+  background: rgba(86,148,159,0.1);
+  border: 1px solid rgba(86,148,159,0.2);
+  box-shadow: none;
+}
+
+body[data-theme="rosepine"] .btn-primary {
+  background: linear-gradient(135deg, #c4a7e7, #907acd);
+  color: #fff;
+  border: 1px solid #7b65b8;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 2px 6px rgba(0,0,0,0.12),
+    0 6px 16px rgba(0,0,0,0.06);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+}
+body[data-theme="rosepine"] .btn-primary:hover {
+  background: linear-gradient(135deg, #d0b8ef, #a08ad5);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    0 4px 12px rgba(0,0,0,0.15),
+    0 10px 24px rgba(0,0,0,0.08);
+}
+
+body[data-theme="rosepine"] .modal {
+  border: 2px solid #26233a;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 4px 12px rgba(0,0,0,0.1),
+    0 12px 32px rgba(0,0,0,0.08),
+    0 24px 48px rgba(0,0,0,0.05);
+}
+body[data-theme="rosepine"] .modal::after { display: none; }
+body[data-theme="rosepine"] .modal-header { background: linear-gradient(135deg, #2a2740, #26233a); }
+body[data-theme="rosepine"] .modal-header::after { display: none; }
+body[data-theme="rosepine"] .modal-title { color: #c4a7e7; }
+body[data-theme="rosepine"] .confirm { border: 2px solid #26233a; }
+body[data-theme="rosepine"] .confirm::after { display: none; }
+
+body[data-theme="rosepine"] .card-action {
+  background: linear-gradient(135deg, #fffaf3, #f2e9e1);
+  box-shadow: 0 1px 3px rgba(87,82,121,0.06);
+}
+
+body[data-theme="rosepine"] .setting-card {
+  background: linear-gradient(135deg, #fffaf3, #f4ede4);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+body[data-theme="rosepine"] .search-box {
+  background: rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Rosé Pine dark */
+body[data-theme="rosepine"].dark-mode {
+  --leather: #1f1d2e;
+  --leather-light: #26233a;
+  --leather-dark: #191724;
+  --leather-edge: #13111d;
+  --paper: #26233a;
+  --paper-dark: #211f30;
+  --paper-shadow: #191724;
+  --cream: #2a2740;
+  --parchment: #26233a;
+  --ink: #e0def4;
+  --ink-light: #c0bdd8;
+  --ink-muted: #908caa;
+  --ink-faint: #6e6a86;
+  --green-ink: #9ccfd8;
+  --green-bg: rgba(156,207,216,0.08);
+}
+body[data-theme="rosepine"].dark-mode .card {
+  background: linear-gradient(135deg, #2a2740, #26233a);
+  border-color: #1f1d2e;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 8px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.2);
+}
+body[data-theme="rosepine"].dark-mode .card:hover {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.35), 0 12px 28px rgba(0,0,0,0.22);
+}
+body[data-theme="rosepine"].dark-mode .card-action {
+  background: linear-gradient(135deg, #2a2740, #26233a);
+  border-color: #1f1d2e;
+}
+body[data-theme="rosepine"].dark-mode .setting-card {
+  background: linear-gradient(135deg, #2a2740, #26233a);
+}
+body[data-theme="rosepine"].dark-mode .modal {
+  border-color: #191724;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 24px 48px rgba(0,0,0,0.3);
+}
+body[data-theme="rosepine"].dark-mode .confirm {
+  border-color: #191724;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 24px 48px rgba(0,0,0,0.3);
+}
+body[data-theme="rosepine"].dark-mode .card-time {
+  color: #9ccfd8;
+  border-color: rgba(156,207,216,0.15);
+}
+body[data-theme="rosepine"].dark-mode .hotkey-row kbd {
+  background: linear-gradient(135deg, #2a2740, #26233a);
+  border-color: #1f1d2e;
+}
+
+/* ============================================
+   3. CYBERPUNK — Neon voltage
+   Near-black base, neon glow borders, hard edges
+   ============================================ */
+body[data-theme="cyberpunk"] {
+  --leather: #0d0d14;
+  --leather-light: #14141f;
+  --leather-dark: #08080e;
+  --leather-edge: #05050a;
+  --paper: #f0f0f5;
+  --paper-dark: #e0e0ea;
+  --paper-shadow: #c5c5d0;
+  --cream: #f5f5fa;
+  --parchment: #eaeaf0;
+  --ink: #0a0a0f;
+  --ink-light: #2a2a35;
+  --ink-muted: #6a6a80;
+  --ink-faint: #9a9ab0;
+  --gold: #ff2a6d;
+  --gold-light: #ff5a8d;
+  --gold-dark: #cc1a55;
+  --red-leather: #ff2a6d;
+  --red-leather-light: #ff5a8d;
+  --green-ink: #05d9e8;
+  --green-bg: rgba(5,217,232,0.08);
+  --stitch: transparent;
+  --noise: none;
+  --grain: none;
+  --font: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+body[data-theme="cyberpunk"] .toolbar {
+  background: linear-gradient(135deg, #14141f, #0d0d14);
+  border-bottom: 1px solid #ff2a6d;
+  box-shadow:
+    inset 0 -1px 0 rgba(255,42,109,0.3),
+    0 0 12px rgba(255,42,109,0.15),
+    0 4px 16px rgba(0,0,0,0.5);
+}
+body[data-theme="cyberpunk"] .toolbar::after { display: none; }
+body[data-theme="cyberpunk"] .brand-name {
+  color: #05d9e8;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  text-shadow: 0 0 8px rgba(5,217,232,0.4);
+}
+
+body[data-theme="cyberpunk"] .card {
+  background: #f5f5fa;
+  border: 1px solid #c5c5d0;
+  border-radius: 4px;
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.06),
+    0 4px 12px rgba(0,0,0,0.04);
+}
+body[data-theme="cyberpunk"] .card:hover {
+  border-color: #ff2a6d;
+  box-shadow:
+    0 0 0 1px rgba(255,42,109,0.3),
+    0 4px 12px rgba(0,0,0,0.08),
+    0 0 16px rgba(255,42,109,0.06);
+  transform: translateY(-1px);
+}
+
+body[data-theme="cyberpunk"] .card-name { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+body[data-theme="cyberpunk"] .card-time {
+  color: #05d9e8;
+  background: rgba(5,217,232,0.08);
+  border: 1px solid rgba(5,217,232,0.2);
+  border-radius: 4px;
+  box-shadow: none;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+body[data-theme="cyberpunk"] .btn-primary {
+  background: linear-gradient(135deg, #ff5a8d, #ff2a6d);
+  color: #fff;
+  border: 1px solid #cc1a55;
+  border-radius: 4px;
+  box-shadow:
+    0 0 8px rgba(255,42,109,0.3),
+    0 2px 6px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="cyberpunk"] .btn-primary:hover {
+  box-shadow:
+    0 0 16px rgba(255,42,109,0.4),
+    0 4px 12px rgba(0,0,0,0.25);
+}
+
+body[data-theme="cyberpunk"] .modal {
+  border: 1px solid #ff2a6d;
+  border-radius: 6px;
+  box-shadow:
+    0 0 20px rgba(255,42,109,0.15),
+    0 8px 24px rgba(0,0,0,0.2),
+    0 24px 48px rgba(0,0,0,0.12);
+}
+body[data-theme="cyberpunk"] .modal::after { display: none; }
+body[data-theme="cyberpunk"] .modal-header {
+  background: linear-gradient(135deg, #14141f, #0d0d14);
+  border-bottom: 1px solid rgba(255,42,109,0.3);
+}
+body[data-theme="cyberpunk"] .modal-header::after { display: none; }
+body[data-theme="cyberpunk"] .modal-title {
+  color: #05d9e8;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="cyberpunk"] .confirm {
+  border: 1px solid #ff2a6d;
+  border-radius: 6px;
+}
+body[data-theme="cyberpunk"] .confirm::after { display: none; }
+
+body[data-theme="cyberpunk"] .card-action {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+body[data-theme="cyberpunk"] .search-box {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(5,217,232,0.15);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+body[data-theme="cyberpunk"] .search-box:focus-within {
+  border-color: #05d9e8;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 0 8px rgba(5,217,232,0.15);
+}
+
+body[data-theme="cyberpunk"] .contact-count {
+  border-color: rgba(5,217,232,0.2);
+  color: rgba(5,217,232,0.6);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* Cyberpunk dark */
+body[data-theme="cyberpunk"].dark-mode {
+  --paper: #12121a;
+  --paper-dark: #0e0e16;
+  --paper-shadow: #08080e;
+  --cream: #181822;
+  --parchment: #14141f;
+  --ink: #d1f7ff;
+  --ink-light: #a0c0d0;
+  --ink-muted: #607080;
+  --ink-faint: #404858;
+  --green-ink: #05d9e8;
+  --green-bg: rgba(5,217,232,0.06);
+}
+body[data-theme="cyberpunk"].dark-mode .card {
+  background: #18182200;
+  background-color: #181822;
+  border: 1px solid #2a2a38;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.25);
+}
+body[data-theme="cyberpunk"].dark-mode .card:hover {
+  border-color: #ff2a6d;
+  box-shadow:
+    0 0 0 1px rgba(255,42,109,0.2),
+    0 4px 12px rgba(0,0,0,0.4),
+    0 0 20px rgba(255,42,109,0.08);
+}
+body[data-theme="cyberpunk"].dark-mode .card-action {
+  background: #1e1e2a;
+  border-color: #2a2a38;
+}
+body[data-theme="cyberpunk"].dark-mode .setting-card {
+  background: #181822;
+  border-color: #2a2a38;
+}
+body[data-theme="cyberpunk"].dark-mode .modal {
+  border-color: #ff2a6d;
+  box-shadow: 0 0 30px rgba(255,42,109,0.1), 0 12px 32px rgba(0,0,0,0.5), 0 32px 64px rgba(0,0,0,0.3);
+}
+body[data-theme="cyberpunk"].dark-mode .confirm {
+  border-color: #ff2a6d;
+  box-shadow: 0 0 30px rgba(255,42,109,0.1), 0 12px 32px rgba(0,0,0,0.5);
+}
+body[data-theme="cyberpunk"].dark-mode .hotkey-row kbd {
+  background: #1e1e2a;
+  border-color: #2a2a38;
+  color: #05d9e8;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="cyberpunk"].dark-mode .card-time {
+  color: #05d9e8;
+  border-color: rgba(5,217,232,0.15);
+}
+
+/* ============================================
+   4. PAPER — Clean minimal
+   Pure white, thin borders, almost no shadows
+   ============================================ */
+body[data-theme="paper"] {
+  --leather: #1a1a1a;
+  --leather-light: #2a2a2a;
+  --leather-dark: #111;
+  --leather-edge: #0a0a0a;
+  --paper: #ffffff;
+  --paper-dark: #f5f5f5;
+  --paper-shadow: #e5e5e5;
+  --cream: #fafafa;
+  --parchment: #f5f5f5;
+  --ink: #1a1a1a;
+  --ink-light: #333;
+  --ink-muted: #888;
+  --ink-faint: #bbb;
+  --gold: #3b82f6;
+  --gold-light: #60a5fa;
+  --gold-dark: #2563eb;
+  --red-leather: #ef4444;
+  --red-leather-light: #f87171;
+  --green-ink: #16a34a;
+  --green-bg: rgba(22,163,74,0.06);
+  --stitch: transparent;
+  --noise: none;
+  --grain: none;
+  --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+}
+
+body[data-theme="paper"] .toolbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+body[data-theme="paper"] .toolbar::after { display: none; }
+body[data-theme="paper"] .brand-name {
+  color: #1a1a1a;
+  text-shadow: none;
+}
+body[data-theme="paper"] .brand-icon { filter: none; }
+body[data-theme="paper"] .contact-count {
+  color: #888;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+}
+body[data-theme="paper"] .search-icon { color: #bbb; }
+body[data-theme="paper"] .search-box {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: none;
+}
+body[data-theme="paper"] .search-box input { color: #1a1a1a; }
+body[data-theme="paper"] .search-box input::placeholder { color: #bbb; }
+body[data-theme="paper"] .search-box:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
+}
+body[data-theme="paper"] .toolbar-btn {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  color: #888;
+  box-shadow: none;
+}
+body[data-theme="paper"] .toolbar-btn:hover {
+  background: #eee;
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+body[data-theme="paper"] .theme-toggle {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  color: #888;
+  box-shadow: none;
+}
+body[data-theme="paper"] .theme-toggle:hover {
+  background: #eee;
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+body[data-theme="paper"] .card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+body[data-theme="paper"] .card:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+body[data-theme="paper"] .card-avatar {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 2px solid #fff;
+}
+body[data-theme="paper"] .card-name {
+  text-shadow: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+}
+body[data-theme="paper"] .card-time {
+  color: #16a34a;
+  background: rgba(22,163,74,0.06);
+  border: 1px solid rgba(22,163,74,0.15);
+  box-shadow: none;
+}
+
+body[data-theme="paper"] .btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  text-shadow: none;
+}
+body[data-theme="paper"] .btn-primary:hover {
+  background: #2563eb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+body[data-theme="paper"] .btn-ghost {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+body[data-theme="paper"] .modal {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 32px rgba(0,0,0,0.06);
+}
+body[data-theme="paper"] .modal::after { display: none; }
+body[data-theme="paper"] .modal-header {
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: none;
+}
+body[data-theme="paper"] .modal-header::after { display: none; }
+body[data-theme="paper"] .modal-title {
+  color: #1a1a1a;
+  text-shadow: none;
+}
+body[data-theme="paper"] .modal-close {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  color: #888;
+  box-shadow: none;
+}
+body[data-theme="paper"] .confirm {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 32px rgba(0,0,0,0.06);
+}
+body[data-theme="paper"] .confirm::after { display: none; }
+
+body[data-theme="paper"] .card-action {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: none;
+  border-radius: 6px;
+}
+body[data-theme="paper"] .card-action:hover { background: #f5f5f5; }
+body[data-theme="paper"] .card-action.delete:hover { background: #fef2f2; border-color: #fca5a5; }
+
+body[data-theme="paper"] .setting-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: none;
+}
+body[data-theme="paper"] .hotkey-row kbd {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+body[data-theme="paper"] .add-btn { border-color: #e5e5e5; }
+body[data-theme="paper"] .add-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+
+/* Paper dark */
+body[data-theme="paper"].dark-mode {
+  --leather: #1a1a1a;
+  --leather-light: #222;
+  --leather-dark: #111;
+  --leather-edge: #0a0a0a;
+  --paper: #1a1a1a;
+  --paper-dark: #151515;
+  --paper-shadow: #0f0f0f;
+  --cream: #222;
+  --parchment: #1e1e1e;
+  --ink: #e5e5e5;
+  --ink-light: #ccc;
+  --ink-muted: #888;
+  --ink-faint: #555;
+  --green-ink: #4ade80;
+  --green-bg: rgba(74,222,128,0.06);
+}
+body[data-theme="paper"].dark-mode .toolbar {
+  background: #1a1a1a;
+  border-bottom-color: #333;
+}
+body[data-theme="paper"].dark-mode .toolbar-btn {
+  background: #222;
+  border-color: #333;
+  color: #888;
+}
+body[data-theme="paper"].dark-mode .theme-toggle {
+  background: #222;
+  border-color: #333;
+  color: #888;
+}
+body[data-theme="paper"].dark-mode .search-box {
+  background: #222;
+  border-color: #333;
+}
+body[data-theme="paper"].dark-mode .search-box input { color: #e5e5e5; }
+body[data-theme="paper"].dark-mode .contact-count { background: #222; border-color: #333; color: #888; }
+body[data-theme="paper"].dark-mode .brand-name { color: #e5e5e5; }
+
+body[data-theme="paper"].dark-mode .card {
+  background: #222;
+  border-color: #333;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+body[data-theme="paper"].dark-mode .card:hover {
+  border-color: #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+body[data-theme="paper"].dark-mode .card-action { background: #2a2a2a; border-color: #333; }
+body[data-theme="paper"].dark-mode .setting-card { background: #222; border-color: #333; }
+body[data-theme="paper"].dark-mode .modal {
+  background-color: #1e1e1e;
+  border-color: #333;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+body[data-theme="paper"].dark-mode .modal-header { background: #1a1a1a; border-bottom-color: #333; }
+body[data-theme="paper"].dark-mode .modal-title { color: #e5e5e5; }
+body[data-theme="paper"].dark-mode .modal-close { background: #222; border-color: #333; color: #888; }
+body[data-theme="paper"].dark-mode .confirm { background-color: #1e1e1e; border-color: #333; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+body[data-theme="paper"].dark-mode .hotkey-row kbd { background: #2a2a2a; border-color: #333; }
+body[data-theme="paper"].dark-mode .btn-ghost { background: #222; border-color: #333; }
+body[data-theme="paper"].dark-mode .card-time { color: #4ade80; border-color: rgba(74,222,128,0.15); }
+
+/* ============================================
+   5. MONOKAI — Dev console
+   Dark charcoal, vivid syntax accents
+   ============================================ */
+body[data-theme="monokai"] {
+  --leather: #272822;
+  --leather-light: #2f302a;
+  --leather-dark: #1e1f1a;
+  --leather-edge: #181914;
+  --paper: #f8f8f2;
+  --paper-dark: #ececd8;
+  --paper-shadow: #d4d4c0;
+  --cream: #fdfdf0;
+  --parchment: #f0f0e2;
+  --ink: #272822;
+  --ink-light: #3e3d32;
+  --ink-muted: #75715e;
+  --ink-faint: #a6a18a;
+  --gold: #e6db74;
+  --gold-light: #f0e898;
+  --gold-dark: #c4b840;
+  --red-leather: #f92672;
+  --red-leather-light: #ff4d8a;
+  --green-ink: #a6e22e;
+  --green-bg: rgba(166,226,46,0.08);
+  --stitch: transparent;
+  --noise: none;
+  --grain: none;
+  --font: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+body[data-theme="monokai"] .toolbar {
+  background: linear-gradient(135deg, #2f302a, #272822);
+  border-bottom: 2px solid #1e1f1a;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 2px 6px rgba(0,0,0,0.3),
+    0 6px 16px rgba(0,0,0,0.15);
+}
+body[data-theme="monokai"] .toolbar::after { display: none; }
+body[data-theme="monokai"] .brand-name {
+  color: #a6e22e;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  text-shadow: 0 0 6px rgba(166,226,46,0.3);
+}
+
+body[data-theme="monokai"] .card {
+  background: #fdfdf0;
+  border: 1px solid #d4d4c0;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    0 1px 3px rgba(0,0,0,0.06),
+    0 4px 12px rgba(0,0,0,0.03);
+}
+body[data-theme="monokai"] .card:hover {
+  border-color: #a6e22e;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    0 2px 8px rgba(0,0,0,0.08),
+    0 0 12px rgba(166,226,46,0.05);
+  transform: translateY(-1px);
+}
+
+body[data-theme="monokai"] .card-name { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+body[data-theme="monokai"] .card-time {
+  color: #66d9ef;
+  background: rgba(102,217,239,0.08);
+  border: 1px solid rgba(102,217,239,0.2);
+  box-shadow: none;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+body[data-theme="monokai"] .btn-primary {
+  background: linear-gradient(135deg, #f0e898, #e6db74);
+  color: #272822;
+  border: 1px solid #c4b840;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    0 2px 4px rgba(0,0,0,0.15);
+  text-shadow: none;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="monokai"] .btn-primary:hover {
+  background: linear-gradient(135deg, #f5eeaa, #f0e898);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    0 4px 8px rgba(0,0,0,0.2);
+}
+
+body[data-theme="monokai"] .btn-danger {
+  background: linear-gradient(135deg, #ff4d8a, #f92672);
+  border-color: #cc1a58;
+}
+
+body[data-theme="monokai"] .modal {
+  border: 2px solid #272822;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.15),
+    0 12px 32px rgba(0,0,0,0.1),
+    0 24px 48px rgba(0,0,0,0.06);
+}
+body[data-theme="monokai"] .modal::after { display: none; }
+body[data-theme="monokai"] .modal-header { background: linear-gradient(135deg, #2f302a, #272822); }
+body[data-theme="monokai"] .modal-header::after { display: none; }
+body[data-theme="monokai"] .modal-title {
+  color: #a6e22e;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="monokai"] .confirm {
+  border: 2px solid #272822;
+  border-radius: 8px;
+}
+body[data-theme="monokai"] .confirm::after { display: none; }
+
+body[data-theme="monokai"] .card-action {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+body[data-theme="monokai"] .search-box {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(166,226,46,0.1);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+body[data-theme="monokai"] .search-box:focus-within {
+  border-color: #a6e22e;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 0 6px rgba(166,226,46,0.15);
+}
+
+body[data-theme="monokai"] .contact-count {
+  color: rgba(166,226,46,0.6);
+  border-color: rgba(166,226,46,0.15);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+body[data-theme="monokai"] .setting-card {
+  background: #fdfdf0;
+  border: 1px solid #d4d4c0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* Monokai dark */
+body[data-theme="monokai"].dark-mode {
+  --paper: #272822;
+  --paper-dark: #222318;
+  --paper-shadow: #1a1b14;
+  --cream: #2f302a;
+  --parchment: #2a2b24;
+  --ink: #f8f8f2;
+  --ink-light: #e0dfc8;
+  --ink-muted: #75715e;
+  --ink-faint: #4a4838;
+  --green-ink: #a6e22e;
+  --green-bg: rgba(166,226,46,0.06);
+}
+body[data-theme="monokai"].dark-mode .card {
+  background: #2f302a;
+  border-color: #3e3d32;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3), 0 6px 16px rgba(0,0,0,0.18);
+}
+body[data-theme="monokai"].dark-mode .card:hover {
+  border-color: #a6e22e;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35), 0 0 12px rgba(166,226,46,0.06);
+}
+body[data-theme="monokai"].dark-mode .card-action {
+  background: #2f302a;
+  border-color: #3e3d32;
+}
+body[data-theme="monokai"].dark-mode .setting-card {
+  background: #2f302a;
+  border-color: #3e3d32;
+}
+body[data-theme="monokai"].dark-mode .modal {
+  border-color: #3e3d32;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 24px 48px rgba(0,0,0,0.3);
+}
+body[data-theme="monokai"].dark-mode .confirm {
+  border-color: #3e3d32;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 24px 48px rgba(0,0,0,0.3);
+}
+body[data-theme="monokai"].dark-mode .card-time {
+  color: #66d9ef;
+  border-color: rgba(102,217,239,0.15);
+}
+body[data-theme="monokai"].dark-mode .hotkey-row kbd {
+  background: #2f302a;
+  border-color: #3e3d32;
+  color: #e6db74;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+body[data-theme="monokai"].dark-mode .btn-ghost {
+  background: #2f302a;
+  border-color: #3e3d32;
+}

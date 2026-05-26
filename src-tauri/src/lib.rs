@@ -50,6 +50,45 @@ fn contacts_path() -> Result<PathBuf, String> {
 // Tauri commands — called from the frontend JS
 // ============================================
 
+/// Theme settings shared between main window and tray popup.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeSettings {
+    pub dark_mode: bool,
+    pub ui_theme: String,
+}
+
+/// Returns ~/.kaibook/theme.json
+fn theme_path() -> Result<PathBuf, String> {
+    let home = dirs::home_dir().ok_or("Could not determine home directory")?;
+    let dir = home.join(".kaibook");
+    if !dir.exists() {
+        fs::create_dir_all(&dir).map_err(|e| format!("Failed to create .kaibook dir: {e}"))?;
+    }
+    Ok(dir.join("theme.json"))
+}
+
+#[tauri::command]
+fn load_theme() -> Result<ThemeSettings, String> {
+    let path = theme_path()?;
+    if !path.exists() {
+        return Ok(ThemeSettings {
+            dark_mode: false,
+            ui_theme: "skeuomorphic".to_string(),
+        });
+    }
+    let data = fs::read_to_string(&path).map_err(|e| format!("Read error: {e}"))?;
+    serde_json::from_str(&data).map_err(|e| format!("Parse error: {e}"))
+}
+
+#[tauri::command]
+fn save_theme(settings: ThemeSettings) -> Result<(), String> {
+    let path = theme_path()?;
+    let json = serde_json::to_string_pretty(&settings).map_err(|e| format!("Serialize error: {e}"))?;
+    fs::write(&path, json).map_err(|e| format!("Write error: {e}"))?;
+    Ok(())
+}
+
 /// Load contacts from ~/.kaibook/contacts.json.
 /// Returns an empty array if the file doesn't exist yet.
 #[tauri::command]
@@ -227,6 +266,8 @@ pub fn run() {
             import_contacts_from,
             show_main_window,
             exit_app,
+            load_theme,
+            save_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running KaiBook");
