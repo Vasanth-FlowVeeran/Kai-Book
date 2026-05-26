@@ -176,16 +176,6 @@ pub fn run() {
                 });
             }
 
-            // ---- Hide popup when it loses focus ----
-            if let Some(popup_window) = app.get_webview_window("tray-popup") {
-                let pw = popup_window.clone();
-                popup_window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::Focused(false) = event {
-                        let _ = pw.hide();
-                    }
-                });
-            }
-
             // ---- Build tray icon ----
             TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
