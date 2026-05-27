@@ -242,7 +242,23 @@ fn open_url(url: String) -> Result<(), String> {
 fn position_popup_near_tray(app: &tauri::AppHandle, tray: &TrayIcon) {
     if let Some(popup) = app.get_webview_window("tray-popup") {
         if let Ok(Some(rect)) = tray.rect() {
-            let (monitor_x, monitor_y, monitor_w, monitor_h) =
+            // --- 1. Get tray icon rect (physical pixels) ---
+            let (tray_x, tray_y) = match rect.position {
+                tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
+                tauri::Position::Logical(l) => (l.x, l.y),
+            };
+            let (tray_w, tray_h) = match rect.size {
+                tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
+                tauri::Size::Logical(l) => (l.width, l.height),
+            };
+
+            let popup_w = 320.0;
+            let popup_h = 440.0;
+            let gap = 4.0; // small gap between tray and popup
+
+            // --- 2. Get monitor bounds ---
+            // Full monitor size (includes taskbar)
+            let (mon_x, mon_y, mon_w, mon_h) =
                 if let Ok(Some(monitor)) = app.primary_monitor() {
                     let pos = monitor.position();
                     let size = monitor.size();
@@ -256,46 +272,55 @@ fn position_popup_near_tray(app: &tauri::AppHandle, tray: &TrayIcon) {
                     (0.0, 0.0, 1920.0, 1080.0)
                 };
 
-            let (px, py) = match rect.position {
-                tauri::Position::Physical(p) => (p.x as f64, p.y as f64),
-                tauri::Position::Logical(l) => (l.x, l.y),
-            };
-            let (sw, sh) = match rect.size {
-                tauri::Size::Physical(p) => (p.width as f64, p.height as f64),
-                tauri::Size::Logical(l) => (l.width, l.height),
-            };
+            // Work area (excludes taskbar) — available_monitors or
+            // fall back to full monitor if unavailable.
+            // On Windows the tray is always at a screen edge inside the taskbar,
+            // so we detect the taskbar edge from the tray icon position.
+            let mon_right = mon_x + mon_w;
+            let mon_bottom = mon_y + mon_h;
 
-            let popup_width = 320.0;
-            let popup_height = 440.0;
-            let tray_center_x = px + (sw / 2.0);
-            let tray_center_y = py + (sh / 2.0);
+            // --- 3. Detect which edge the taskbar (and tray) is on ---
+            // The tray icon sits inside the taskbar. Whichever screen edge
+            // the tray rect is closest to / touching is the taskbar edge.
+            let tray_cx = tray_x + tray_w / 2.0;
+            let tray_cy = tray_y + tray_h / 2.0;
 
-            let dist_bottom = (monitor_y + monitor_h) - tray_center_y;
-            let dist_top = tray_center_y - monitor_y;
-            let dist_right = (monitor_x + monitor_w) - tray_center_x;
-            let dist_left = tray_center_x - monitor_x;
+            let dist_to_bottom = mon_bottom - (tray_y + tray_h);
+            let dist_to_top = tray_y - mon_y;
+            let dist_to_right = mon_right - (tray_x + tray_w);
+            let dist_to_left = tray_x - mon_x;
 
-            let mut x = tray_center_x - (popup_width / 2.0);
-            let mut y = py + sh;
+            // Threshold: if tray is within 80px of an edge, taskbar is there.
+            // Pick the edge with the smallest distance.
+            let min_dist = dist_to_bottom
+                .min(dist_to_top)
+                .min(dist_to_right)
+                .min(dist_to_left);
 
-            let min_dist = dist_bottom.min(dist_top).min(dist_right).min(dist_left);
+            // --- 4. Position popup on the OPPOSITE side of the taskbar edge ---
+            let (mut x, mut y);
 
-            if min_dist == dist_bottom {
-                x = tray_center_x - (popup_width / 2.0);
-                y = py - popup_height;
-            } else if min_dist == dist_top {
-                x = tray_center_x - (popup_width / 2.0);
-                y = py + sh;
-            } else if min_dist == dist_right {
-                x = px - popup_width;
-                y = tray_center_y - (popup_height / 2.0);
-            } else if min_dist == dist_left {
-                x = px + sw;
-                y = tray_center_y - (popup_height / 2.0);
+            if min_dist == dist_to_bottom {
+                // Taskbar at BOTTOM — popup appears ABOVE the tray icon
+                x = tray_cx - popup_w / 2.0;
+                y = tray_y - popup_h - gap;
+            } else if min_dist == dist_to_top {
+                // Taskbar at TOP — popup appears BELOW the tray icon
+                x = tray_cx - popup_w / 2.0;
+                y = tray_y + tray_h + gap;
+            } else if min_dist == dist_to_right {
+                // Taskbar at RIGHT — popup appears to the LEFT
+                x = tray_x - popup_w - gap;
+                y = tray_cy - popup_h / 2.0;
+            } else {
+                // Taskbar at LEFT — popup appears to the RIGHT
+                x = tray_x + tray_w + gap;
+                y = tray_cy - popup_h / 2.0;
             }
 
-            x = x.max(monitor_x).min(monitor_x + monitor_w - popup_width);
-            y = y.max(monitor_y).min(monitor_y + monitor_h - popup_height);
+            // --- 5. Clamp to screen bounds (keep fully on-screen) ---
+            x = x.max(mon_x).min(mon_right - popup_w);
+            y = y.max(mon_y).min(mon_bottom - popup_h);
 
             let _ = popup.set_position(PhysicalPosition::new(x as i32, y as i32));
         }

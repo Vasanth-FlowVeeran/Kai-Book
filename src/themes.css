@@ -33,6 +33,7 @@ body[data-theme="nordic"] {
   --noise: none;
   --grain: none;
   --font: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+  --font-ui: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
 }
 
 body[data-theme="nordic"] .toolbar {
@@ -217,6 +218,7 @@ body[data-theme="rosepine"] {
   --noise: none;
   --grain: none;
   --font: 'Metrophobic', 'Georgia', 'Times New Roman', serif;
+  --font-ui: 'Metrophobic', 'Georgia', 'Times New Roman', serif;
 }
 
 body[data-theme="rosepine"] .toolbar {
@@ -1287,6 +1289,7 @@ body[data-theme="paper"] {
   --noise: none;
   --grain: none;
   --font: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
+  --font-ui: 'Metrophobic', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', system-ui, sans-serif;
 }
 
 body[data-theme="paper"] .toolbar {
@@ -1534,7 +1537,8 @@ body[data-theme="monokai"] {
   --stitch: transparent;
   --noise: none;
   --grain: none;
-  --font: 'Metrophobic', 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  --font: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+  --font-ui: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
 }
 
 body[data-theme="monokai"] .toolbar {
