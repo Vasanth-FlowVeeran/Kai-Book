@@ -1,5 +1,5 @@
 /* ============================================
-   KaiBook Tray - Skeuomorphic Design
+   KaiBook Tray: Skeuomorphic Design
    A little leather pocket address book.
    ============================================ */
 
@@ -61,7 +61,7 @@ body {
 }
 
 /* ============================================
-   Container - leather book cover
+   Container: leather book cover
    ============================================ */
 .tray {
   background: linear-gradient(135deg, var(--leather-light), var(--leather));
@@ -126,7 +126,7 @@ body.dark-mode .tray-search input::placeholder {
 }
 
 /* ============================================
-   Group Tabs - compact pills
+   Group Tabs: compact pills
    ============================================ */
 .tray-tabs {
   display: flex;
@@ -200,7 +200,7 @@ body.dark-mode .tray-tabs {
 }
 
 /* ============================================
-   Contact List - paper pages
+   Contact List: paper pages
    ============================================ */
 .tray-list {
   flex: 1;
@@ -244,7 +244,7 @@ body.qa-open .tray-list {
   background: rgba(42, 106, 58, 0.1);
 }
 
-/* Avatar wrapper - holds avatar + TOD badge */
+/* Avatar wrapper: holds avatar + TOD badge */
 .avatar-wrap {
   position: relative;
   flex-shrink: 0;
@@ -351,7 +351,7 @@ body.qa-open .tray-list {
   margin-top: 1px;
 }
 
-/* Tray mail button - visible on hover */
+/* Tray mail button: visible on hover */
 .tray-mail-btn {
   display: flex;
   align-items: center;
@@ -502,7 +502,7 @@ body.dark-mode .tray-page-btn:hover:not(.disabled) {
 }
 
 /* ============================================
-   Quick Add Form - on parchment
+   Quick Add Form: on parchment
    ============================================ */
 .qa {
   border-top: 1px solid rgba(0,0,0,0.1);
@@ -632,7 +632,7 @@ select.qa-input option {
 }
 
 /* ============================================
-   Footer Actions - leather strip
+   Footer Actions: leather strip
    ============================================ */
 .tray-footer {
   border-top: 1px solid var(--leather-edge);
@@ -684,7 +684,7 @@ select.qa-input option {
 }
 
 /* ============================================
-   Light Mode - white chrome (all themes except cyberpunk)
+   Light Mode: white chrome (all themes except cyberpunk)
    ============================================ */
 body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray {
   background: #fff;
@@ -722,7 +722,7 @@ body:not([data-theme="cyberpunk"]):not(.dark-mode) .tray-action--danger:hover {
 }
 
 /* ============================================
-   Dark Mode - aged leather in dim light
+   Dark Mode: aged leather in dim light
    ============================================ */
 body.dark-mode {
   --leather: #2a2018;
@@ -746,12 +746,12 @@ body.dark-mode {
   --stitch: #8a7040;
 }
 
-/* Dark mode - tray list background */
+/* Dark mode: tray list background */
 body.dark-mode .tray-list {
   background: var(--paper);
 }
 
-/* Dark mode - contact row hover */
+/* Dark mode: contact row hover */
 body.dark-mode .contact-row:hover {
   background: rgba(197, 149, 58, 0.06);
 }
@@ -762,7 +762,7 @@ body.dark-mode .contact-row.copied {
   background: rgba(106, 191, 122, 0.08);
 }
 
-/* Dark mode - time badge */
+/* Dark mode: time badge */
 body.dark-mode .time-badge {
   border-color: rgba(106, 191, 122, 0.15);
   box-shadow:
@@ -771,12 +771,12 @@ body.dark-mode .time-badge {
     0 1px 2px rgba(0,0,0,0.15);
 }
 
-/* Dark mode - copied tooltip */
+/* Dark mode: copied tooltip */
 body.dark-mode .contact-row.copied::after {
   color: var(--gold-light);
 }
 
-/* Dark mode - quick add form */
+/* Dark mode: quick add form */
 body.dark-mode .qa {
   background: var(--parchment);
   border-top-color: rgba(255,240,220,0.03);
@@ -846,7 +846,7 @@ body.dark-mode .qa-btn-cancel:hover {
   to   { opacity: 1; }
 }
 
-/* Contact row entrance - stagger via inline style animation-delay */
+/* Contact row entrance, staggered via inline style animation-delay */
 .contact-row {
   animation: tray-row-in 0.18s ease both;
   will-change: transform, opacity;

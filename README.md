@@ -11,6 +11,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS">
   <img src="https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=windows11&logoColor=white" alt="Windows">
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux">
   <img src="https://img.shields.io/badge/Tauri_v2-FFC131?style=for-the-badge&logo=tauri&logoColor=333" alt="Tauri v2">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
   <img src="https://img.shields.io/github/v/release/Vasanth-FlowVeeran/Kai-Book?style=for-the-badge&color=blue" alt="GitHub Release">
@@ -18,21 +19,21 @@
 
 ---
 
-KaiBook lives in your system tray and gives you instant access to your contacts - no need to open a full app. Search, add, and organize contacts by groups, mark favorites, and see at a glance what time it is for each contact with time-of-day indicators. Built with Tauri v2 for a tiny footprint and native performance.
+KaiBook lives in your system tray and gives you instant access to your contacts without opening a full app. Search, add, and organize contacts by groups, mark favorites, and see at a glance what time it is for each contact with time-of-day indicators. Built with Tauri v2 for a tiny footprint and native performance.
 
 ## Features
 
-- **System tray access** - click the tray icon to open a compact contact panel without leaving your workflow
-- **Full main window** - expand into a feature-rich contact manager when you need more space
-- **Smart search** - instantly filter contacts by name, email, phone, or notes
-- **Groups & favorites** - organize contacts into custom groups and star your most-used ones
-- **Time-of-day indicators** - see whether it's morning, afternoon, evening, or night for each contact based on their timezone
-- **Timezone awareness** - store each contact's timezone and always know the right time to reach out
-- **Quick add** - add new contacts directly from the tray without opening the main window
-- **Multiple themes** - choose from several built-in themes including a cyberpunk mode
-- **Import / Export** - back up your contacts as JSON or migrate from other tools
-- **Lightweight** - Tauri v2 means a ~8 MB installer instead of 200+ MB Electron apps
-- **Offline-first** - all data stored locally on your machine, no cloud account needed
+- **System tray access**: click the tray icon to open a compact contact panel without leaving your workflow
+- **Full main window**: expand into a feature-rich contact manager when you need more space
+- **Smart search**: instantly filter contacts by name, email, phone, or notes
+- **Groups & favorites**: organize contacts into custom groups and star your most-used ones
+- **Time-of-day indicators**: see whether it's morning, afternoon, evening, or night for each contact based on their timezone
+- **Timezone awareness**: store each contact's timezone and always know the right time to reach out
+- **Quick add**: add new contacts directly from the tray without opening the main window
+- **Multiple themes**: choose from several built-in themes including a cyberpunk mode
+- **Import / Export**: back up your contacts as JSON or migrate from other tools
+- **Lightweight**: Tauri v2 means a ~8 MB installer instead of 200+ MB Electron apps
+- **Offline-first**: all data stored locally on your machine, no cloud account needed
 
 ## Install
 
@@ -56,16 +57,16 @@ Open the DMG and drag KaiBook to Applications.
 
 ### Windows
 
-Download the `.exe` installer from the [latest release](https://github.com/Vasanth-FlowVeeran/Kai-Book/releases/latest) and run it. The NSIS installer handles everything - no admin rights required.
+Download the `.exe` installer from the [latest release](https://github.com/Vasanth-FlowVeeran/Kai-Book/releases/latest) and run it. The NSIS installer handles everything and no admin rights are required.
 
 ## Usage
 
 - **Single-click** the tray icon to open the quick-access popup with live local times.
 - **Double-click** the tray icon (or click "Open KaiBook") to open the full app window.
 - **Click a contact** in the popup to copy their email/phone to clipboard.
-- **Quick Add** - use the "+" button in the popup to add a contact inline.
-- **Search** - filter contacts by name, email, or phone in the popup or the main window.
-- **Import/Export** - go to Settings in the main window to export or import contacts as JSON.
+- **Quick Add**: use the "+" button in the popup to add a contact inline.
+- **Search**: filter contacts by name, email, or phone in the popup or the main window.
+- **Import/Export**: go to Settings in the main window to export or import contacts as JSON.
 - **Right-click** the tray icon for a context menu with "Open KaiBook" and "Quit".
 
 ## Development
@@ -142,4 +143,4 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-[MIT](LICENSE) - Copyright CIFR
+[MIT](LICENSE). Copyright CIFR

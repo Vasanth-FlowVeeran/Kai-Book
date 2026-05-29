@@ -86,7 +86,7 @@ fn contacts_path() -> Result<PathBuf, String> {
 }
 
 // ============================================
-// Tauri commands - called from the frontend JS
+// Tauri commands: called from the frontend JS
 // ============================================
 
 /// Theme settings shared between main window and tray popup.
