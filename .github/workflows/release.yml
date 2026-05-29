@@ -65,16 +65,11 @@ jobs:
 
             **macOS (Homebrew):**
             ```
-            brew tap Vasanth-FlowVeeran/kaibook
+            brew tap ImSounic/kaibook
             brew install --cask kaibook
             ```
 
-            **Windows (Chocolatey):**
-            ```
-            choco install kaibook
-            ```
-
-            **Manual:** Download the appropriate installer below.
+            **Windows:** Download the `.exe` or `.msi` installer below.
           releaseDraft: true
           prerelease: false
           tauriScript: npx tauri
@@ -86,5 +81,5 @@ jobs:
     steps:
       - name: Note
         run: |
-          echo "After publishing the draft release, run the update scripts"
-          echo "for Homebrew and Chocolatey with the new version and SHA256."
+          echo "After publishing the draft release, run the update script"
+          echo "for Homebrew with the new version and SHA256."

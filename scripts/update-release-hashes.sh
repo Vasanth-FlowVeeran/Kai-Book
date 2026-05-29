@@ -1,7 +1,7 @@
 #!/bin/bash
 # update-release-hashes.sh — After publishing a GitHub Release, run this to
 # download the artifacts, compute SHA256 hashes, and update the Homebrew
-# formula and Chocolatey install script automatically.
+# formula automatically.
 #
 # Usage:  ./scripts/update-release-hashes.sh <version> <github-username>
 # Example: ./scripts/update-release-hashes.sh 1.0.0 myusername
@@ -50,24 +50,6 @@ if [ -f "$FORMULA" ]; then
   rm -f "${FORMULA}.bak"
 fi
 
-# Update Chocolatey install script
-CHOCO="chocolatey/tools/chocolateyinstall.ps1"
-if [ -f "$CHOCO" ]; then
-  sed -i.bak "s|/download/v[^/]*/KaiBook_[^']*|/download/v${VERSION}/KaiBook_${VERSION}_x64-setup.exe|" "$CHOCO"
-  sed -i.bak "s/REPLACE_WITH_SHA256/${SHA_WIN}/" "$CHOCO"
-  echo "==> Updated ${CHOCO}"
-  rm -f "${CHOCO}.bak"
-fi
-
-# Update Chocolatey nuspec version
-NUSPEC="chocolatey/kaibook.nuspec"
-if [ -f "$NUSPEC" ]; then
-  sed -i.bak "s|<version>.*</version>|<version>${VERSION}</version>|" "$NUSPEC"
-  echo "==> Updated ${NUSPEC}"
-  rm -f "${NUSPEC}.bak"
-fi
-
 echo ""
 echo "Done! Review the changes, then:"
 echo "  1. Push the Homebrew formula to your homebrew-kaibook tap repo"
-echo "  2. Run: cd chocolatey && choco pack && choco push kaibook.${VERSION}.nupkg --source https://push.chocolatey.org/"

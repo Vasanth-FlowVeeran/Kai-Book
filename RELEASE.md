@@ -3,11 +3,10 @@
 ## Prerequisites
 
 - [Rust](https://rustup.rs/) installed
-- [Node.js 20+](https://nodejs.org/) installed
+- [Node.js 22+](https://nodejs.org/) installed
 - [Tauri CLI](https://v2.tauri.app/start/prerequisites/) set up
 - GitHub account with a repo for Kai-Book
 - (macOS) Apple Developer account for code signing & notarization (optional but recommended)
-- (Windows) [Chocolatey account](https://community.chocolatey.org/account) for publishing
 
 
 ## 1. Bump the Version
@@ -57,7 +56,7 @@ Pushing the tag triggers the GitHub Actions workflow at `.github/workflows/relea
 4. Click **Publish release**
 
 
-## 5. Update Package Manager Hashes
+## 5. Update Homebrew Hashes
 
 After the release is published and artifacts are downloadable:
 
@@ -65,7 +64,7 @@ After the release is published and artifacts are downloadable:
 ./scripts/update-release-hashes.sh 1.0.0 YOUR_GITHUB_USERNAME
 ```
 
-This downloads each artifact, computes SHA256 checksums, and patches the Homebrew formula and Chocolatey install script automatically.
+This downloads each artifact, computes SHA256 checksums, and patches the Homebrew formula automatically.
 
 
 ## 6. Publish to Homebrew
@@ -98,37 +97,7 @@ brew install --cask kaibook
 3. Commit and push
 
 
-## 7. Publish to Chocolatey
-
-### First-time setup
-
-1. Create an account at https://community.chocolatey.org
-2. Get your API key from your account page
-3. Save it locally: `choco apikey --key YOUR_API_KEY --source https://push.chocolatey.org/`
-
-### Pack and push
-
-```bash
-cd chocolatey
-choco pack
-choco push kaibook.1.0.0.nupkg --source https://push.chocolatey.org/
-```
-
-Chocolatey has a moderation queue — your package will be reviewed before going live (usually 1–3 days).
-
-### Users install with
-
-```powershell
-choco install kaibook
-```
-
-### Future releases
-
-1. Run the hash update script (step 5) — it patches the nuspec version and installer URL
-2. `cd chocolatey && choco pack && choco push`
-
-
-## 8. macOS Code Signing & Notarization (Optional)
+## 7. macOS Code Signing & Notarization (Optional)
 
 For a signed release that doesn't trigger Gatekeeper warnings, set these GitHub repo secrets:
 
@@ -154,4 +123,3 @@ Without these, the app builds fine but users will see "unidentified developer" o
 | Tag release | `git tag -a v1.0.0 -m "v1.0.0" && git push origin v1.0.0` |
 | Update hashes | `./scripts/update-release-hashes.sh 1.0.0 USERNAME` |
 | Homebrew push | Copy formula to tap repo, commit, push |
-| Chocolatey push | `cd chocolatey && choco pack && choco push` |
