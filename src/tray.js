@@ -133,6 +133,15 @@ async function init() {
     }
     renderContacts();
   });
+
+  if (window.__TAURI__.window && window.__TAURI__.window.getCurrentWindow) {
+    var appWindow = window.__TAURI__.window.getCurrentWindow();
+    appWindow.onFocusChanged(function (event) {
+      if (!event.payload) {
+        appWindow.hide();
+      }
+    });
+  }
 }
 
 async function initTheme() {
