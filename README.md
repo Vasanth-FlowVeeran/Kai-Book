@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux">
   <img src="https://img.shields.io/badge/Tauri_v2-FFC131?style=for-the-badge&logo=tauri&logoColor=333" alt="Tauri v2">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
-  <img src="https://img.shields.io/github/v/release/Vasanth-FlowVeeran/Kai-Book?style=for-the-badge&color=blue" alt="GitHub Release">
+  
 </p>
 
 ---
