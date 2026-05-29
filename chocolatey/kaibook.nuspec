@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>kaibook</id>
+    <version>1.0.0</version>
+    <title>KaiBook</title>
+    <authors>CIFR</authors>
+    <owners>CIFR</owners>
+    <projectUrl>https://github.com/Vasanth-FlowVeeran/Kai-Book</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Vasanth-FlowVeeran/Kai-Book/main/src-tauri/icons/128x128.png</iconUrl>
+    <licenseUrl>https://github.com/Vasanth-FlowVeeran/Kai-Book/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A versatile system tray contact book for freelancers. KaiBook lives in your system tray and gives you instant access to client contacts with favorites, contact groups, drag-to-reorder, multiple themes, and search.</description>
+    <summary>System tray contact book for freelancers</summary>
+    <tags>contacts tray freelancer productivity tauri</tags>
+    <packageSourceUrl>https://github.com/Vasanth-FlowVeeran/Kai-Book/tree/main/chocolatey</packageSourceUrl>
+    <bugTrackerUrl>https://github.com/Vasanth-FlowVeeran/Kai-Book/issues</bugTrackerUrl>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
