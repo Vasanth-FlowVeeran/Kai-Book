@@ -15,6 +15,7 @@ use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut,
 pub struct TrayState {
     click_task: Mutex<Option<JoinHandle<()>>>,
     last_double_click: Mutex<Option<Instant>>,
+    pub last_window_hide: Mutex<Option<Instant>>,
 }
 
 pub struct TrayIconState {
@@ -243,7 +244,7 @@ fn position_popup_near_tray(app: &tauri::AppHandle, center: tauri::PhysicalPosit
     if let Some(popup) = app.get_webview_window("tray-popup") {
         let popup_w = 320.0;
         let popup_h = 440.0;
-        let gap = 4.0; // small gap between tray and popup
+        let gap = 8.0; // ~0.5 rem gap between cursor and popup
 
         let tray_cx = center.x;
         let tray_cy = center.y;
@@ -377,8 +378,12 @@ pub fn run() {
             // ---- Auto-hide tray popup when it loses focus ----
             if let Some(popup_window) = app.get_webview_window("tray-popup") {
                 let w = popup_window.clone();
+                let app_handle = app.handle().clone();
                 popup_window.on_window_event(move |event| {
                     if let tauri::WindowEvent::Focused(false) = event {
+                        if let Some(state) = app_handle.try_state::<TrayState>() {
+                            *state.last_window_hide.lock().unwrap() = Some(Instant::now());
+                        }
                         let _ = w.hide();
                     }
                 });
@@ -427,6 +432,15 @@ pub fn run() {
                                 }
                             }
 
+                            // If the window was hidden via focus loss within the last 300ms,
+                            // the user clicked the tray while the window was open, causing it to lose focus.
+                            // We shouldn't reopen it in this case!
+                            if let Some(last_hide) = *state.last_window_hide.lock().unwrap() {
+                                if last_hide.elapsed() < std::time::Duration::from_millis(300) {
+                                    return;
+                                }
+                            }
+
                             // Cancel any pending click task to debounce rapid/rigorous clicking
                             if let Some(task) = state.click_task.lock().unwrap().take() {
                                 task.abort();
@@ -440,9 +454,7 @@ pub fn run() {
                                 tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
                                 if let Some(popup) = app_clone.get_webview_window("tray-popup") {
-                                    if popup.is_visible().unwrap_or(false) {
-                                        let _ = popup.hide();
-                                    } else {
+                                    if !popup.is_visible().unwrap_or(false) {
                                         position_popup_near_tray(&app_clone, tray_pos);
                                         let _ = popup.show();
                                         let _ = popup.set_focus();
