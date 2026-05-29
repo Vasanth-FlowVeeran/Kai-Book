@@ -1,5 +1,5 @@
 #!/bin/bash
-# update-release-hashes.sh — After publishing a GitHub Release, run this to
+# update-release-hashes.sh -After publishing a GitHub Release, run this to
 # download the artifacts, compute SHA256 hashes, and update the Homebrew
 # formula automatically.
 #

@@ -1,5 +1,5 @@
 // ============================================
-// KaiBook — Main Application Logic (Redesigned)
+// KaiBook - Main Application Logic (Redesigned)
 // ============================================
 
 // Detect Tauri environment
@@ -176,7 +176,7 @@ const MOCK_CONTACTS = [
     phoneSecondary: "",
     address: "Roma Norte, Mexico City, Mexico",
     timezone: "America/Mexico_City",
-    notes: "Motion designer. Night owl — often online late.",
+    notes: "Motion designer. Night owl - often online late.",
     createdAt: "2026-05-23T11:00:00Z",
     updatedAt: "2026-05-23T11:00:00Z",
   },
@@ -215,7 +215,7 @@ const MOCK_CONTACTS = [
     phoneSecondary: "",
     address: "Södermalm, Stockholm, Sweden",
     timezone: "Europe/Stockholm",
-    notes: "Illustrator. Part-time — available Mon/Wed/Fri.",
+    notes: "Illustrator. Part-time - available Mon/Wed/Fri.",
     createdAt: "2026-05-24T12:00:00Z",
     updatedAt: "2026-05-24T12:00:00Z",
   },
@@ -228,7 +228,7 @@ const MOCK_CONTACTS = [
     phoneSecondary: "",
     address: "Surry Hills, Sydney, Australia",
     timezone: "Australia/Sydney",
-    notes: "DevOps lead. Early riser — best before noon AEST.",
+    notes: "DevOps lead. Early riser - best before noon AEST.",
     createdAt: "2026-05-25T03:00:00Z",
     updatedAt: "2026-05-25T03:00:00Z",
   },
@@ -449,7 +449,7 @@ function startLiveClock() {
       const tz = el.dataset.timezone;
       if (tz) el.textContent = formatTime(tz);
     });
-    // Update TOD badges — only re-roll phrase when period actually changes
+    // Update TOD badges - only re-roll phrase when period actually changes
     document.querySelectorAll(".tod-badge").forEach((el) => {
       const card = el.closest(".card");
       if (!card) return;
@@ -509,28 +509,28 @@ const TOD_PHRASES = {
     "Coffee hasn't kicked in yet",
     "Maybe wait for their first coffee",
     "They might be mid-yawn",
-    "Dawn patrol — tread lightly",
+    "Dawn patrol - tread lightly",
     "Give them 30 more minutes"
   ],
   "late-morning": [
     "Good time to reach out!",
-    "They're warmed up — go for it",
-    "Sweet spot — fully caffeinated",
+    "They're warmed up - go for it",
+    "Sweet spot - fully caffeinated",
     "Prime time to ping them",
     "They're in the zone, say hi!",
-    "Green light — send that message"
+    "Green light - send that message"
   ],
   "early-afternoon": [
-    "Post-lunch — might be slow to reply",
+    "Post-lunch - might be slow to reply",
     "Could be in a food coma",
     "They're around, fire away",
-    "Afternoon mode — fair game",
+    "Afternoon mode - fair game",
     "Probably at their desk",
-    "Good window — catch them now"
+    "Good window - catch them now"
   ],
   "late-afternoon": [
     "Winding down soon",
-    "Still working — get in quick",
+    "Still working - get in quick",
     "Last chance before EOD",
     "Clock is ticking on their day",
     "Catch them before they log off",
@@ -538,11 +538,11 @@ const TOD_PHRASES = {
   ],
   "early-evening": [
     "They're off the clock",
-    "Dinner time — maybe wait",
-    "Personal time — keep it short",
+    "Dinner time - maybe wait",
+    "Personal time - keep it short",
     "Unless it's urgent, hold off",
     "They've mentally checked out",
-    "Evening vibes — not ideal"
+    "Evening vibes - not ideal"
   ],
   "evening": [
     "Couch mode activated",
@@ -597,7 +597,7 @@ function bindEvents() {
   document.getElementById("btn-add-contact").addEventListener("click", () => openForm());
   document.getElementById("btn-add-first").addEventListener("click", () => openForm());
 
-  // Tab bar — All and Favorites
+  // Tab bar - All and Favorites
   document.querySelector('.tab[data-tab="all"]').addEventListener("click", () => switchTab("all"));
   document.querySelector('.tab[data-tab="favorites"]').addEventListener("click", () => switchTab("favorites"));
   document.getElementById("tab-add-group").addEventListener("click", createGroupInline);
@@ -667,7 +667,7 @@ function bindEvents() {
 }
 
 // ============================================
-// TABS — Groups & Favorites
+// TABS - Groups & Favorites
 // ============================================
 function renderTabs() {
   const scroll = document.getElementById("tab-scroll");
@@ -1126,7 +1126,7 @@ function renderContacts() {
 // DRAG TO REORDER (mouse-event based)
 // ============================================
 
-// Shared drag state — lives outside bindDragReorder so mousemove/mouseup
+// Shared drag state - lives outside bindDragReorder so mousemove/mouseup
 // on document can reference it even after a re-render.
 let _drag = null;
 
@@ -1151,7 +1151,7 @@ function _cleanupDrag() {
   _drag = null;
 }
 
-// Runs once — attaches the global mousemove / mouseup that drive every drag.
+// Runs once - attaches the global mousemove / mouseup that drive every drag.
 let _dragGlobalBound = false;
 function _bindDragGlobal() {
   if (_dragGlobalBound) return;
@@ -1177,7 +1177,7 @@ function _bindDragGlobal() {
       const midY = rect.top + rect.height / 2;
 
       if (e.clientY < midY) {
-        // Insert BEFORE this card — line goes above it
+        // Insert BEFORE this card - line goes above it
         line.style.top = (rect.top - 1) + "px";
         line.style.left = rect.left + "px";
         line.style.width = rect.width + "px";
@@ -1187,7 +1187,7 @@ function _bindDragGlobal() {
         placed = true;
         break;
       } else if (i === cards.length - 1 || (e.clientY >= midY && (i + 1 >= cards.length || e.clientY < cards[i + 1].getBoundingClientRect().top + cards[i + 1].getBoundingClientRect().height / 2))) {
-        // Insert AFTER this card — line goes below it
+        // Insert AFTER this card - line goes below it
         line.style.top = (rect.bottom + 1) + "px";
         line.style.left = rect.left + "px";
         line.style.width = rect.width + "px";
@@ -1521,7 +1521,7 @@ function showOnboarding() {
 function bindOnboarding() {
   const overlay = document.getElementById("onboarding-overlay");
 
-  // Step navigation — "Get Started" / "Next"
+  // Step navigation - "Get Started" / "Next"
   document.getElementById("ob-start").addEventListener("click", () => goToOnboardingStep(1));
   document.getElementById("ob-theme-next").addEventListener("click", () => goToOnboardingStep(2));
 
@@ -1532,7 +1532,7 @@ function bindOnboarding() {
     });
   });
 
-  // Theme cards — live preview
+  // Theme cards - live preview
   document.querySelectorAll(".ob-theme-card").forEach(card => {
     card.addEventListener("click", () => {
       document.querySelectorAll(".ob-theme-card").forEach(c => c.classList.remove("active"));

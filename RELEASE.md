@@ -1,4 +1,4 @@
-# KaiBook — Release Guide
+# KaiBook - Release Guide
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ This downloads each artifact, computes SHA256 checksums, and patches the Homebre
 
 ## 6. Publish to Homebrew
 
-Homebrew uses a **tap** — a separate GitHub repo that holds your formula.
+Homebrew uses a **tap** - a separate GitHub repo that holds your formula.
 
 ### First-time setup
 

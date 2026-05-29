@@ -91,7 +91,7 @@ cat > ~/.kaibook/contacts.json << 'EOF'
     "phoneSecondary": "",
     "address": "Roma Norte, Mexico City, Mexico",
     "timezone": "America/Mexico_City",
-    "notes": "Motion designer. Night owl — often online late.",
+    "notes": "Motion designer. Night owl - often online late.",
     "createdAt": "2026-05-23T11:00:00Z",
     "updatedAt": "2026-05-23T11:00:00Z"
   },
@@ -130,7 +130,7 @@ cat > ~/.kaibook/contacts.json << 'EOF'
     "phoneSecondary": "",
     "address": "Södermalm, Stockholm, Sweden",
     "timezone": "Europe/Stockholm",
-    "notes": "Illustrator. Part-time — available Mon/Wed/Fri.",
+    "notes": "Illustrator. Part-time - available Mon/Wed/Fri.",
     "createdAt": "2026-05-24T12:00:00Z",
     "updatedAt": "2026-05-24T12:00:00Z"
   },
@@ -143,7 +143,7 @@ cat > ~/.kaibook/contacts.json << 'EOF'
     "phoneSecondary": "",
     "address": "Surry Hills, Sydney, Australia",
     "timezone": "Australia/Sydney",
-    "notes": "DevOps lead. Early riser — best before noon AEST.",
+    "notes": "DevOps lead. Early riser - best before noon AEST.",
     "createdAt": "2026-05-25T03:00:00Z",
     "updatedAt": "2026-05-25T03:00:00Z"
   },
