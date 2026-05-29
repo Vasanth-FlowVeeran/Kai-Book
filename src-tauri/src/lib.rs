@@ -432,6 +432,19 @@ pub fn run() {
                                 }
                             }
 
+                            // If the main window is visible, single-clicking the tray icon should hide the main window
+                            // and NOT show the tray popup.
+                            if let Some(main_window) = app.get_webview_window("main") {
+                                if main_window.is_visible().unwrap_or(false) {
+                                    // Cancel any pending click task to debounce rapid/rigorous clicking
+                                    if let Some(task) = state.click_task.lock().unwrap().take() {
+                                        task.abort();
+                                    }
+                                    let _ = main_window.hide();
+                                    return;
+                                }
+                            }
+
                             // If the window was hidden via focus loss within the last 300ms,
                             // the user clicked the tray while the window was open, causing it to lose focus.
                             // We shouldn't reopen it in this case!
