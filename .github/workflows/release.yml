@@ -17,7 +17,7 @@ jobs:
           - platform: macos-latest
             target: aarch64-apple-darwin
             label: macOS-arm64
-          - platform: macos-latest
+          - platform: macos-13
             target: x86_64-apple-darwin
             label: macOS-x64
           - platform: windows-latest
@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -98,9 +98,9 @@ jobs:
             **Manual:** Download the appropriate installer below.
           releaseDraft: true
           prerelease: false
+          tauriScript: npx tauri
           args: --target ${{ matrix.target }}
 
-  # After all builds, compute checksums
   checksums:
     needs: build
     runs-on: ubuntu-latest
