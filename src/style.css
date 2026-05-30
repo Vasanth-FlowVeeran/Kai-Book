@@ -1,5 +1,5 @@
 /* ============================================
-   KaiBook — Skeuomorphic Design
+   KaiBook: Skeuomorphic Design
    A warm, tactile address book that feels real.
    ============================================ */
 
@@ -125,7 +125,7 @@ body {
 }
 
 /* ============================================
-   Buttons — embossed, tactile
+   Buttons: embossed, tactile
    ============================================ */
 .btn {
   display: inline-flex;
@@ -235,7 +235,7 @@ body {
 }
 
 /* ============================================
-   Toolbar — leather strip with stitching
+   Toolbar: leather strip with stitching
    ============================================ */
 .toolbar {
   display: flex;
@@ -392,7 +392,7 @@ body {
 }
 
 /* ============================================
-   Pages — paper area
+   Pages: paper area
    ============================================ */
 .page {
   padding: 24px;
@@ -709,7 +709,7 @@ body.is-dragging * {
   gap: 10px;
 }
 
-/* Contact Card — index card style */
+/* Contact Card: index card style */
 .card {
   background: linear-gradient(135deg, var(--cream), var(--paper));
   border: 1px solid var(--paper-shadow);
@@ -745,7 +745,7 @@ body.is-dragging * {
   gap: 12px;
 }
 
-/* Avatar wrapper — holds avatar + TOD badge */
+/* Avatar wrapper: holds avatar + TOD badge */
 .card-avatar-wrap {
   position: relative;
   flex-shrink: 0;
@@ -776,7 +776,7 @@ body.is-dragging * {
   object-fit: cover;
 }
 
-/* Custom tooltip for TOD badge — anchored to avatar wrap */
+/* Custom tooltip for TOD badge, anchored to avatar wrap */
 .card-avatar-wrap:hover .tod-badge::after {
   opacity: 1;
 }
@@ -1026,7 +1026,7 @@ body.is-dragging * {
   letter-spacing: 0.03em;
 }
 
-/* Add button — dashed like a form field */
+/* Add button: dashed like a form field */
 .add-btn {
   display: flex;
   align-items: center;
@@ -1108,7 +1108,7 @@ body.is-dragging * {
 }
 
 /* ============================================
-   Modal — leather-bound dialog
+   Modal: leather-bound dialog
    ============================================ */
 .modal-overlay {
   position: fixed;
@@ -1401,13 +1401,13 @@ body.is-dragging * {
   gap: 8px;
 }
 
-/* Confirm close animation — uses modal-overlay.closing from modal styles */
+/* Confirm close animation, uses modal-overlay.closing from modal styles */
 .modal-overlay.closing .confirm {
   animation: modal-out 0.15s ease forwards;
 }
 
 /* ============================================
-   Settings — parchment pages
+   Settings: parchment pages
    ============================================ */
 .settings {
   max-width: 520px;
@@ -1802,7 +1802,7 @@ body.dark-mode .theme-swatch {
 }
 
 /* ============================================
-   Dark Mode — aged leather by candlelight
+   Dark Mode: aged leather by candlelight
    ============================================ */
 body.dark-mode {
   --leather: #2a2018;
@@ -1828,12 +1828,12 @@ body.dark-mode {
   --stitch: #8a7040;
 }
 
-/* Dark mode — scrollbar */
+/* Dark mode: scrollbar */
 body.dark-mode ::-webkit-scrollbar-track {
   background: var(--paper-dark);
 }
 
-/* Dark mode — tab bar */
+/* Dark mode: tab bar */
 body.dark-mode .tab-bar {
   background: var(--paper);
   border-bottom-color: var(--paper-shadow);
@@ -1867,7 +1867,7 @@ body.dark-mode .group-dropdown {
 }
 body.dark-mode .group-dropdown-item { color: var(--ink); }
 
-/* Dark mode — cards with canonical shadow stack */
+/* Dark mode: cards with canonical shadow stack */
 body.dark-mode .card {
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
@@ -1885,18 +1885,18 @@ body.dark-mode .card:hover {
     0 20px 40px rgba(0,0,0,0.2);
 }
 
-/* Dark mode — card name text shadow off */
+/* Dark mode: card name text shadow off */
 body.dark-mode .card-name {
   text-shadow: none;
 }
 
-/* Dark mode — time badge */
+/* Dark mode: time badge */
 body.dark-mode .card-time {
   border-color: rgba(106, 191, 122, 0.2);
   box-shadow: none;
 }
 
-/* Dark mode — card actions */
+/* Dark mode: card actions */
 body.dark-mode .card-actions {
   background: linear-gradient(90deg, transparent, var(--paper) 16px);
 }
@@ -1933,7 +1933,7 @@ body.dark-mode .card-action.delete:hover {
   color: #f0a0a0;
 }
 
-/* Dark mode — add button */
+/* Dark mode: add button */
 body.dark-mode .add-btn {
   border-color: rgba(255,255,255,0.08);
   color: var(--ink-faint);
@@ -1943,7 +1943,7 @@ body.dark-mode .add-btn:hover {
   background: rgba(197, 149, 58, 0.06);
 }
 
-/* Dark mode — ghost button */
+/* Dark mode: ghost button */
 body.dark-mode .btn-ghost {
   background: linear-gradient(135deg, var(--cream), var(--parchment));
   color: var(--ink-muted);
@@ -1969,7 +1969,7 @@ body.dark-mode .btn-ghost:hover {
     0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* Dark mode — form inputs */
+/* Dark mode: form inputs */
 body.dark-mode .form-group input,
 body.dark-mode .form-group select,
 body.dark-mode .form-group textarea {
@@ -2000,12 +2000,12 @@ body.dark-mode .form-group select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236a6050' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
-/* Dark mode — form section divider */
+/* Dark mode: form section divider */
 body.dark-mode .form-section {
   border-bottom-color: rgba(255,255,255,0.04);
 }
 
-/* Dark mode — card detail divider & tags */
+/* Dark mode: card detail divider & tags */
 body.dark-mode .card-details {
   border-top-color: rgba(255,255,255,0.04);
 }
@@ -2014,7 +2014,7 @@ body.dark-mode .card-tag {
   border-color: rgba(255,255,255,0.04);
 }
 
-/* Dark mode — modal */
+/* Dark mode: modal */
 body.dark-mode .modal {
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
@@ -2031,12 +2031,12 @@ body.dark-mode .modal {
     0 40px 60px -20px rgba(0,0,0,0.6);
 }
 
-/* Dark mode — modal overlay */
+/* Dark mode: modal overlay */
 body.dark-mode .modal-overlay {
   background: rgba(10, 8, 5, 0.8);
 }
 
-/* Dark mode — confirm */
+/* Dark mode: confirm */
 body.dark-mode .confirm {
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.04),
@@ -2053,7 +2053,7 @@ body.dark-mode .confirm {
     0 40px 60px -20px rgba(0,0,0,0.6);
 }
 
-/* Dark mode — setting cards */
+/* Dark mode: setting cards */
 body.dark-mode .setting-card {
   box-shadow:
     inset 0 1px 0 rgba(255,240,220,0.03),
@@ -2063,7 +2063,7 @@ body.dark-mode .setting-card {
     0 16px 32px rgba(0,0,0,0.08);
 }
 
-/* Dark mode — hotkey keys */
+/* Dark mode: hotkey keys */
 body.dark-mode .hotkey-row kbd {
   background: linear-gradient(135deg, var(--cream), var(--parchment));
   border-color: var(--paper-shadow);
@@ -2075,7 +2075,7 @@ body.dark-mode .hotkey-row kbd {
     0 8px 16px rgba(0,0,0,0.08);
 }
 
-/* Dark mode — back button */
+/* Dark mode: back button */
 body.dark-mode .back-btn {
   background: linear-gradient(135deg, var(--cream), var(--parchment));
   border-color: var(--paper-shadow);
@@ -2097,7 +2097,7 @@ body.dark-mode .back-btn:hover {
     0 12px 24px rgba(0,0,0,0.08);
 }
 
-/* Dark mode — setting path */
+/* Dark mode: setting path */
 body.dark-mode .setting-path {
   background: rgba(0,0,0,0.2);
   border-color: rgba(255,240,220,0.04);
@@ -2107,7 +2107,7 @@ body.dark-mode .setting-path {
     0 1px 0 rgba(255,240,220,0.01);
 }
 
-/* Dark mode — page side shadows */
+/* Dark mode: page side shadows */
 body.dark-mode .page {
   box-shadow:
     inset 1px 0 0 rgba(255,240,220,0.03),
@@ -2118,7 +2118,7 @@ body.dark-mode .page {
     8px 0 24px rgba(0,0,0,0.2);
 }
 
-/* Dark mode — empty state */
+/* Dark mode: empty state */
 body.dark-mode .empty {
   background: var(--paper);
   background-image: var(--noise);

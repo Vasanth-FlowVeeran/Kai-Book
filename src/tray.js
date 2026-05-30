@@ -1,5 +1,5 @@
 // ============================================
-// KaiBook — Tray Popup Logic (Redesigned)
+// KaiBook: Tray Popup Logic (Redesigned)
 // ============================================
 
 let contacts = [];
@@ -14,7 +14,7 @@ async function invoke(cmd, args) {
 }
 
 // ============================================
-// Avatar colors — gradient pairs
+// Avatar colors: gradient pairs
 // ============================================
 var GRADIENTS = [
   ["#6c5ce7", "#a29bfe"],
@@ -296,7 +296,7 @@ function startClock() {
       var tz = el.dataset.timezone;
       if (tz) el.textContent = fmtTime(tz);
     });
-    // Update TOD badges — only re-roll phrase when period actually changes
+    // Update TOD badges, only re-roll phrase when period actually changes
     document.querySelectorAll(".tod-badge").forEach(function (el) {
       var row = el.closest(".contact-row");
       if (!row) return;
@@ -351,28 +351,28 @@ var TOD_PHRASES = {
     "Coffee hasn't kicked in yet",
     "Maybe wait for their first coffee",
     "They might be mid-yawn",
-    "Dawn patrol — tread lightly",
+    "Dawn patrol, tread lightly",
     "Give them 30 more minutes"
   ],
   "late-morning": [
     "Good time to reach out!",
-    "They're warmed up — go for it",
-    "Sweet spot — fully caffeinated",
+    "They're warmed up, go for it",
+    "Sweet spot, fully caffeinated",
     "Prime time to ping them",
     "They're in the zone, say hi!",
-    "Green light — send that message"
+    "Green light, send that message"
   ],
   "early-afternoon": [
-    "Post-lunch — might be slow to reply",
+    "Post-lunch, might be slow to reply",
     "Could be in a food coma",
     "They're around, fire away",
-    "Afternoon mode — fair game",
+    "Afternoon mode, fair game",
     "Probably at their desk",
-    "Good window — catch them now"
+    "Good window, catch them now"
   ],
   "late-afternoon": [
     "Winding down soon",
-    "Still working — get in quick",
+    "Still working, get in quick",
     "Last chance before EOD",
     "Clock is ticking on their day",
     "Catch them before they log off",
@@ -380,11 +380,11 @@ var TOD_PHRASES = {
   ],
   "early-evening": [
     "They're off the clock",
-    "Dinner time — maybe wait",
-    "Personal time — keep it short",
+    "Dinner time, maybe wait",
+    "Personal time, keep it short",
     "Unless it's urgent, hold off",
     "They've mentally checked out",
-    "Evening vibes — not ideal"
+    "Evening vibes, not ideal"
   ],
   "evening": [
     "Couch mode activated",
@@ -490,7 +490,7 @@ function bindEvents() {
     renderContacts();
   });
 
-  // Tab clicks — All and Favorites
+  // Tab clicks: All and Favorites
   document.querySelector('.tray-tab[data-tab="all"]').addEventListener("click", function () {
     trayActiveTab = "all";
     trayPage = 0;

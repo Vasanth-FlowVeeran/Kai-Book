@@ -1,6 +1,6 @@
 [package]
 name = "kai-book"
-version = "0.1.0"
+version = "1.0.0"
 description = "A versatile system tray contact book for freelancers"
 authors = ["Raj"]
 edition = "2021"
