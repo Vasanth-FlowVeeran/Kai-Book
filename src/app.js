@@ -353,6 +353,16 @@ async function init() {
   renderTabs();
   renderAll();
 
+  // Dynamically set version
+  if (IS_TAURI && window.__TAURI__ && window.__TAURI__.app) {
+    window.__TAURI__.app.getVersion()
+      .then(v => {
+        const el = document.getElementById("about-version");
+        if (el) el.textContent = `KaiBook v${v} · MIT License`;
+      })
+      .catch(e => console.warn("Failed to get version:", e));
+  }
+
   // Show onboarding on first launch
   if (!_onboardingComplete) {
     showOnboarding();
