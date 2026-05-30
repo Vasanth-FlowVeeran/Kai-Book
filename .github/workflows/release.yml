@@ -23,6 +23,9 @@ jobs:
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             label: Windows-x64
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            label: Linux-x64
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -33,6 +36,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -70,6 +79,8 @@ jobs:
             ```
 
             **Windows:** Download the `.exe` or `.msi` installer below.
+
+            **Linux:** Download the `.deb` or `.AppImage` below.
           releaseDraft: true
           prerelease: false
           tauriScript: npx tauri

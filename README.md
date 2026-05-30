@@ -59,6 +59,18 @@ Open the DMG and drag KaiBook to Applications.
 
 Download the `.exe` installer from the [latest release](https://github.com/Vasanth-FlowVeeran/Kai-Book/releases/latest) and run it. The NSIS installer handles everything and no admin rights are required.
 
+### Linux
+
+Download from the [latest release](https://github.com/Vasanth-FlowVeeran/Kai-Book/releases/latest):
+
+| Format | File |
+|--------|------|
+| Debian/Ubuntu | `KaiBook_x.x.x_amd64.deb` |
+| Other distros | `KaiBook_x.x.x_amd64.AppImage` |
+
+For `.deb`: `sudo dpkg -i KaiBook_*.deb`
+For `.AppImage`: `chmod +x KaiBook_*.AppImage && ./KaiBook_*.AppImage`
+
 ## Usage
 
 - **Single-click** the tray icon to open the quick-access popup with live local times.
