@@ -21,6 +21,10 @@
 
 KaiBook lives in your system tray and gives you instant access to your contacts without opening a full app. Search, add, and organize contacts by groups, mark favorites, and see at a glance what time it is for each contact with time-of-day indicators. Built with Tauri v2 for a tiny footprint and native performance.
 
+https://github.com/user-attachments/assets/0094e1cc-4157-4ecb-bf2d-10dbe9adfe64
+
+
+
 ## Features
 
 - **System tray access**: click the tray icon to open a compact contact panel without leaving your workflow
